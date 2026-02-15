@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:talent_phere_ai/Admin/approved_company_tabs.dart';
 import 'package:talent_phere_ai/Admin/company_approval_tab.dart';
 import 'package:talent_phere_ai/Admin/overview_tab.dart';
 
@@ -24,7 +25,7 @@ class AdminDashboardPage extends StatelessWidget {
           children: [
             OverviewTab(),
             CompanyApprovalTab(),
-            Center(child: Text("Approved Companies")),
+            ApprovedCompaniesTab(),
           ],
         ),
       ),
