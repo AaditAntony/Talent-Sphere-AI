@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:talent_phere_ai/Admin/user_detail_page.dart';
 
 class UsersManagementTab extends StatelessWidget {
   const UsersManagementTab({super.key});
