@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'admin_login.dart';
+
 class AdminRegisterPage extends StatefulWidget {
   const AdminRegisterPage({super.key});
 
@@ -47,7 +49,13 @@ class _AdminRegisterPageState extends State<AdminRegisterPage> {
         ),
       );
 
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const AdminLoginPage(),
+        ),
+      );
+
 
     } catch (e) {
       ScaffoldMessenger.of(context)

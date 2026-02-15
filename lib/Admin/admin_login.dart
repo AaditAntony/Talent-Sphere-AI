@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'admin_dashboard_page.dart';
+
+import 'admin_dashboard.dart';
+import 'admin_register_page.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({super.key});
@@ -90,6 +92,24 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                     ? const CircularProgressIndicator()
                     : const Text("Login"),
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Not registered? "),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AdminRegisterPage(),
+                        ),
+                      );
+                    },
+                    child: const Text("Register"),
+                  ),
+                ],
+              ),
+
             ],
           ),
         ),
