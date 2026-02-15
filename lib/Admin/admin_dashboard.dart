@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:talent_phere_ai/Admin/approved_company_tabs.dart';
 import 'package:talent_phere_ai/Admin/company_approval_tab.dart';
 import 'package:talent_phere_ai/Admin/overview_tab.dart';
+import 'package:talent_phere_ai/Admin/user_management_tab.dart';
 
 class AdminDashboardPage extends StatelessWidget {
   const AdminDashboardPage({super.key});
@@ -8,7 +10,7 @@ class AdminDashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // change later if needed
+      length: 4, // change later if needed
       child: Scaffold(
         appBar: AppBar(
           title: const Text("TalentSphereAI - Admin"),
@@ -17,6 +19,7 @@ class AdminDashboardPage extends StatelessWidget {
               Tab(text: "Overview"),
               Tab(text: "Approvals"),
               Tab(text: "Companies"),
+              Tab(text: "Users"),
             ],
           ),
         ),
@@ -24,7 +27,8 @@ class AdminDashboardPage extends StatelessWidget {
           children: [
             OverviewTab(),
             CompanyApprovalTab(),
-            Center(child: Text("Approved Companies")),
+            ApprovedCompaniesTab(),
+            UsersManagementTab(),
           ],
         ),
       ),
