@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:talent_phere_ai/Admin/company_approval_tab.dart';
 import 'package:talent_phere_ai/Admin/overview_tab.dart';
 
 class AdminDashboardPage extends StatelessWidget {
@@ -22,7 +23,7 @@ class AdminDashboardPage extends StatelessWidget {
         body: TabBarView(
           children: [
             OverviewTab(),
-            Center(child: Text("Approval Screen")),
+            CompanyApprovalTab(),
             Center(child: Text("Approved Companies")),
           ],
         ),
