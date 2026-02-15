@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
 class OverviewTab extends StatelessWidget {
   const OverviewTab({super.key});
 
@@ -45,9 +48,7 @@ class OverviewTab extends StatelessWidget {
         .where('isApproved', isEqualTo: true)
         .get();
 
-    final jobs = await FirebaseFirestore.instance
-        .collection('jobs')
-        .get();
+    final jobs = await FirebaseFirestore.instance.collection('jobs').get();
 
     final applications = await FirebaseFirestore.instance
         .collection('applications')
@@ -74,16 +75,11 @@ class OverviewTab extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16),
-          ),
+          Text(title, style: const TextStyle(fontSize: 16)),
           const SizedBox(height: 10),
           Text(
             count.toString(),
-            style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
         ],
       ),
