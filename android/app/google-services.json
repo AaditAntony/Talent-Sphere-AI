@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "356781804304",
+    "project_id": "talent-sphere-ai-bbeca",
+    "storage_bucket": "talent-sphere-ai-bbeca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356781804304:android:878bdc1db2b810a4e0b395",
+        "android_client_info": {
+          "package_name": "com.example.talent_phere_ai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1wgjjFOBwIb5sHGla_cwW23wv_P5nLqI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
