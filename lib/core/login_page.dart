@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:talent_phere_ai/company/company_signup_page.dart';
 import 'auth_wrapper.dart';
 // import 'company_signup_page.dart';
 // import 'user_signup_page.dart';
@@ -108,19 +109,20 @@ class _LoginPageState extends State<LoginPage> {
                 //     );
                 //   },
                 //   child: const Text("User Register"),
+                
                 // ),
 
-                // TextButton(
-                //   onPressed: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (_) => const CompanySignUpPage(),
-                //       ),
-                //     );
-                //   },
-                //   child: const Text("Company Register"),
-                // ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CompanySignUpPage(),
+                      ),
+                    );
+                  },
+                  child: const Text("Company Register"),
+                ),
               ],
             ),
           ],
