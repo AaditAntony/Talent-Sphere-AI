@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talent_phere_ai/company/waiting_approval_screen.dart';
 
-
 class CompanyProfileSetupPage extends StatefulWidget {
   const CompanyProfileSetupPage({super.key});
 
@@ -15,9 +14,7 @@ class CompanyProfileSetupPage extends StatefulWidget {
       _CompanyProfileSetupPageState();
 }
 
-class _CompanyProfileSetupPageState
-    extends State<CompanyProfileSetupPage> {
-
+class _CompanyProfileSetupPageState extends State<CompanyProfileSetupPage> {
   final _formKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
@@ -32,10 +29,11 @@ class _CompanyProfileSetupPageState
 
   bool isLoading = false;
 
+  // 🔹 Pick image and convert to Base64
   Future<void> pickImage(bool isProfile) async {
     final picked = await ImagePicker().pickImage(
       source: ImageSource.gallery,
-      imageQuality: 70,
+      imageQuality: 70, // compress
     );
 
     if (picked != null) {
@@ -55,15 +53,13 @@ class _CompanyProfileSetupPageState
     }
   }
 
+  // 🔹 Submit company details
   Future<void> submitProfile() async {
-
     if (!_formKey.currentState!.validate()) return;
 
     if (profileBase64 == null || certificateBase64 == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please upload required images"),
-        ),
+        const SnackBar(content: Text("Please upload all required images")),
       );
       return;
     }
@@ -71,32 +67,32 @@ class _CompanyProfileSetupPageState
     setState(() => isLoading = true);
 
     try {
-
       final uid = FirebaseAuth.instance.currentUser!.uid;
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .update({
-
+      // 1️⃣ Create company document
+      await FirebaseFirestore.instance.collection('companies').doc(uid).set({
         "name": nameController.text.trim(),
         "address": addressController.text.trim(),
         "foundedYear": foundedController.text.trim(),
         "profileImage": profileBase64,
         "certificateImage": certificateBase64,
+        "createdAt": Timestamp.now(),
+      });
+
+      // 2️⃣ Update user flags
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
         "isProfileComplete": true,
       });
 
+      // 3️⃣ Navigate to waiting approval
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const WaitingApprovalPage(),
-        ),
+        MaterialPageRoute(builder: (_) => const WaitingApprovalPage()),
       );
-
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
 
     setState(() => isLoading = false);
@@ -104,11 +100,8 @@ class _CompanyProfileSetupPageState
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Complete Company Profile"),
-      ),
+      appBar: AppBar(title: const Text("Complete Company Profile")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -116,43 +109,38 @@ class _CompanyProfileSetupPageState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-
               const Text(
-                "Complete Your Company Details",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                "Enter Your Company Details",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 20),
 
               TextFormField(
                 controller: nameController,
-                decoration:
-                    const InputDecoration(labelText: "Company Name"),
-                validator: (v) =>
-                    v!.isEmpty ? "Enter company name" : null,
+                decoration: const InputDecoration(labelText: "Company Name"),
+                validator: (v) => v!.isEmpty ? "Enter company name" : null,
               ),
 
               const SizedBox(height: 15),
 
               TextFormField(
                 controller: addressController,
-                decoration:
-                    const InputDecoration(labelText: "Company Address"),
+                decoration: const InputDecoration(labelText: "Company Address"),
+                validator: (v) => v!.isEmpty ? "Enter company address" : null,
               ),
 
               const SizedBox(height: 15),
 
               TextFormField(
                 controller: foundedController,
-                decoration:
-                    const InputDecoration(labelText: "Founded Year"),
+                decoration: const InputDecoration(labelText: "Founded Year"),
+                validator: (v) => v!.isEmpty ? "Enter founded year" : null,
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
 
+              // 🔹 Profile Image Preview
               profileImageFile != null
                   ? Image.file(profileImageFile!, height: 120)
                   : const Text("No Profile Image Selected"),
@@ -164,6 +152,7 @@ class _CompanyProfileSetupPageState
 
               const SizedBox(height: 20),
 
+              // 🔹 Certificate Preview
               certificateImageFile != null
                   ? Image.file(certificateImageFile!, height: 120)
                   : const Text("No Certificate Selected"),
