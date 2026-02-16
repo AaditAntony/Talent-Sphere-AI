@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:talent_phere_ai/company/company_profile_setup.dart';
+import 'package:talent_phere_ai/company/waiting_approval_screen.dart';
 
-// import 'admin_dashboard_page.dart';
-// import 'company_dashboard_page.dart';
-// import 'user_dashboard_page.dart';
-// import 'waiting_approval_page.dart';
+//import '../company/company_dashboard_page.dart';
+//import '../user/user_dashboard_page.dart';
 import 'login_page.dart';
 
 class AuthWrapper extends StatelessWidget {
@@ -16,22 +15,23 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+      builder: (context, authSnapshot) {
+        // 🔄 Loading state
+        if (authSnapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        if (!snapshot.hasData) {
+        // ❌ Not logged in
+        if (!authSnapshot.hasData) {
           return const LoginPage();
         }
 
-        return FutureBuilder(
-          future: FirebaseFirestore.instance
-              .collection('users')
-              .doc(snapshot.data!.uid)
-              .get(),
+        final uid = authSnapshot.data!.uid;
+
+        return FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
           builder: (context, userSnapshot) {
             if (!userSnapshot.hasData) {
               return const Scaffold(
@@ -39,41 +39,39 @@ class AuthWrapper extends StatelessWidget {
               );
             }
 
-            final userData = userSnapshot.data!;
-            final role = userData['role'];
-            final isApproved = userData['isApproved'] ?? false;
+            final data = userSnapshot.data!.data() as Map<String, dynamic>;
 
-            // ===== WEB PLATFORM =====
-            if (kIsWeb) {
-              if (role == "admin" && isApproved == true) {
-                // return const AdminDashboardPage();
-              } else {
-                FirebaseAuth.instance.signOut();
-                return const LoginPage();
+            final role = data['role'];
+            final isApproved = data['isApproved'] ?? false;
+            final isProfileComplete = data['isProfileComplete'] ?? false;
+
+            // 🟢 USER FLOW
+            if (role == "user") {
+              //return const UserDashboardPage();
+            }
+
+            // 🟣 COMPANY FLOW
+            if (role == "company") {
+              if (!isProfileComplete) {
+                return const CompanyProfileSetupPage();
+              }
+
+              if (isProfileComplete && !isApproved) {
+                return const WaitingApprovalPage();
+              }
+
+              if (isApproved) {
+                return const CompanyDashboardPage();
               }
             }
 
-            // ===== MOBILE PLATFORM =====
-            // if (!kIsWeb) {
+            // 🔴 ADMIN ON MOBILE (Not Allowed)
+            if (role == "admin") {
+              FirebaseAuth.instance.signOut();
+              return const LoginPage();
+            }
 
-            //   if (role == "user") {
-            //     return const UserDashboardPage();
-            //   }
-
-            //   if (role == "company") {
-            //     if (isApproved == true) {
-            //       return const CompanyDashboardPage();
-            //     } else {
-            //       return const WaitingApprovalPage();
-            //     }
-            //   }
-
-            //   if (role == "admin") {
-            //     FirebaseAuth.instance.signOut();
-            //     return const LoginPage();
-            //   }
-            // }
-
+            // Default fallback
             return const LoginPage();
           },
         );
