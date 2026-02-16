@@ -133,3 +133,4 @@ class CompanyDetailPage extends StatelessWidget {
     );
   }
 }
+// the code is modified
