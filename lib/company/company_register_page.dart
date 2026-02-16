@@ -1,196 +1,196 @@
-import 'dart:io';
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'dart:io';
+// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CompanyRegisterPage extends StatefulWidget {
-  const CompanyRegisterPage({super.key});
+// class CompanyRegisterPage extends StatefulWidget {
+//   const CompanyRegisterPage({super.key});
 
-  @override
-  State<CompanyRegisterPage> createState() => _CompanyRegisterPageState();
-}
+//   @override
+//   State<CompanyRegisterPage> createState() => _CompanyRegisterPageState();
+// }
 
-class _CompanyRegisterPageState extends State<CompanyRegisterPage> {
+// class _CompanyRegisterPageState extends State<CompanyRegisterPage> {
 
-  final _formKey = GlobalKey<FormState>();
+//   final _formKey = GlobalKey<FormState>();
 
-  final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final addressController = TextEditingController();
-  final foundedController = TextEditingController();
+//   final nameController = TextEditingController();
+//   final emailController = TextEditingController();
+//   final passwordController = TextEditingController();
+//   final addressController = TextEditingController();
+//   final foundedController = TextEditingController();
 
-  File? profileImageFile;
-  File? certificateImageFile;
+//   File? profileImageFile;
+//   File? certificateImageFile;
 
-  String? profileBase64;
-  String? certificateBase64;
+//   String? profileBase64;
+//   String? certificateBase64;
 
-  bool isLoading = false;
+//   bool isLoading = false;
 
-  Future<void> pickImage(bool isProfile) async {
-    final picked = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 70, // compress image
-    );
+//   Future<void> pickImage(bool isProfile) async {
+//     final picked = await ImagePicker().pickImage(
+//       source: ImageSource.gallery,
+//       imageQuality: 70, // compress image
+//     );
 
-    if (picked != null) {
-      File file = File(picked.path);
-      List<int> imageBytes = await file.readAsBytes();
-      String base64String = base64Encode(imageBytes);
+//     if (picked != null) {
+//       File file = File(picked.path);
+//       List<int> imageBytes = await file.readAsBytes();
+//       String base64String = base64Encode(imageBytes);
 
-      setState(() {
-        if (isProfile) {
-          profileImageFile = file;
-          profileBase64 = base64String;
-        } else {
-          certificateImageFile = file;
-          certificateBase64 = base64String;
-        }
-      });
-    }
-  }
+//       setState(() {
+//         if (isProfile) {
+//           profileImageFile = file;
+//           profileBase64 = base64String;
+//         } else {
+//           certificateImageFile = file;
+//           certificateBase64 = base64String;
+//         }
+//       });
+//     }
+//   }
 
-  Future<void> registerCompany() async {
+//   Future<void> registerCompany() async {
 
-    if (!_formKey.currentState!.validate()) return;
+//     if (!_formKey.currentState!.validate()) return;
 
-    if (profileBase64 == null || certificateBase64 == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please upload all required images")),
-      );
-      return;
-    }
+//     if (profileBase64 == null || certificateBase64 == null) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text("Please upload all required images")),
+//       );
+//       return;
+//     }
 
-    setState(() => isLoading = true);
+//     setState(() => isLoading = true);
 
-    try {
+//     try {
 
-      UserCredential credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+//       UserCredential credential =
+//           await FirebaseAuth.instance.createUserWithEmailAndPassword(
+//         email: emailController.text.trim(),
+//         password: passwordController.text.trim(),
+//       );
 
-      final uid = credential.user!.uid;
+//       final uid = credential.user!.uid;
 
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        "name": nameController.text.trim(),
-        "email": emailController.text.trim(),
-        "address": addressController.text.trim(),
-        "foundedYear": foundedController.text.trim(),
-        "profileImage": profileBase64,
-        "certificateImage": certificateBase64,
-        "role": "company",
-        "isApproved": false,
-        "createdAt": Timestamp.now(),
-      });
+//       await FirebaseFirestore.instance.collection('users').doc(uid).set({
+//         "name": nameController.text.trim(),
+//         "email": emailController.text.trim(),
+//         "address": addressController.text.trim(),
+//         "foundedYear": foundedController.text.trim(),
+//         "profileImage": profileBase64,
+//         "certificateImage": certificateBase64,
+//         "role": "company",
+//         "isApproved": false,
+//         "createdAt": Timestamp.now(),
+//       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Registration successful. Wait for admin approval."),
-        ),
-      );
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text("Registration successful. Wait for admin approval."),
+//         ),
+//       );
 
-      Navigator.pop(context);
+//       Navigator.pop(context);
 
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
-    }
+//     } catch (e) {
+//       ScaffoldMessenger.of(context)
+//           .showSnackBar(SnackBar(content: Text(e.toString())));
+//     }
 
-    setState(() => isLoading = false);
-  }
+//     setState(() => isLoading = false);
+//   }
 
-  @override
-  Widget build(BuildContext context) {
+//   @override
+//   Widget build(BuildContext context) {
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Company Registration")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+//     return Scaffold(
+//       appBar: AppBar(title: const Text("Company Registration")),
+//       body: SingleChildScrollView(
+//         padding: const EdgeInsets.all(20),
+//         child: Form(
+//           key: _formKey,
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             children: [
 
-              TextFormField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: "Company Name"),
-                validator: (v) => v!.isEmpty ? "Enter company name" : null,
-              ),
+//               TextFormField(
+//                 controller: nameController,
+//                 decoration: const InputDecoration(labelText: "Company Name"),
+//                 validator: (v) => v!.isEmpty ? "Enter company name" : null,
+//               ),
 
-              const SizedBox(height: 10),
+//               const SizedBox(height: 10),
 
-              TextFormField(
-                controller: emailController,
-                decoration: const InputDecoration(labelText: "Email"),
-                validator: (v) => v!.isEmpty ? "Enter email" : null,
-              ),
+//               TextFormField(
+//                 controller: emailController,
+//                 decoration: const InputDecoration(labelText: "Email"),
+//                 validator: (v) => v!.isEmpty ? "Enter email" : null,
+//               ),
 
-              const SizedBox(height: 10),
+//               const SizedBox(height: 10),
 
-              TextFormField(
-                controller: passwordController,
-                decoration: const InputDecoration(labelText: "Password"),
-                obscureText: true,
-                validator: (v) =>
-                    v!.length < 6 ? "Minimum 6 characters required" : null,
-              ),
+//               TextFormField(
+//                 controller: passwordController,
+//                 decoration: const InputDecoration(labelText: "Password"),
+//                 obscureText: true,
+//                 validator: (v) =>
+//                     v!.length < 6 ? "Minimum 6 characters required" : null,
+//               ),
 
-              const SizedBox(height: 10),
+//               const SizedBox(height: 10),
 
-              TextFormField(
-                controller: addressController,
-                decoration: const InputDecoration(labelText: "Address"),
-              ),
+//               TextFormField(
+//                 controller: addressController,
+//                 decoration: const InputDecoration(labelText: "Address"),
+//               ),
 
-              const SizedBox(height: 10),
+//               const SizedBox(height: 10),
 
-              TextFormField(
-                controller: foundedController,
-                decoration: const InputDecoration(labelText: "Founded Year"),
-              ),
+//               TextFormField(
+//                 controller: foundedController,
+//                 decoration: const InputDecoration(labelText: "Founded Year"),
+//               ),
 
-              const SizedBox(height: 20),
+//               const SizedBox(height: 20),
 
-              // PROFILE IMAGE PREVIEW
-              profileImageFile != null
-                  ? Image.file(profileImageFile!, height: 120)
-                  : const Text("No Profile Image Selected"),
+//               // PROFILE IMAGE PREVIEW
+//               profileImageFile != null
+//                   ? Image.file(profileImageFile!, height: 120)
+//                   : const Text("No Profile Image Selected"),
 
-              ElevatedButton(
-                onPressed: () => pickImage(true),
-                child: const Text("Upload Profile Image"),
-              ),
+//               ElevatedButton(
+//                 onPressed: () => pickImage(true),
+//                 child: const Text("Upload Profile Image"),
+//               ),
 
-              const SizedBox(height: 20),
+//               const SizedBox(height: 20),
 
-              // CERTIFICATE PREVIEW
-              certificateImageFile != null
-                  ? Image.file(certificateImageFile!, height: 120)
-                  : const Text("No Certificate Selected"),
+//               // CERTIFICATE PREVIEW
+//               certificateImageFile != null
+//                   ? Image.file(certificateImageFile!, height: 120)
+//                   : const Text("No Certificate Selected"),
 
-              ElevatedButton(
-                onPressed: () => pickImage(false),
-                child: const Text("Upload Certificate"),
-              ),
+//               ElevatedButton(
+//                 onPressed: () => pickImage(false),
+//                 child: const Text("Upload Certificate"),
+//               ),
 
-              const SizedBox(height: 30),
+//               const SizedBox(height: 30),
 
-              ElevatedButton(
-                onPressed: isLoading ? null : registerCompany,
-                child: isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text("Register Company"),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+//               ElevatedButton(
+//                 onPressed: isLoading ? null : registerCompany,
+//                 child: isLoading
+//                     ? const CircularProgressIndicator()
+//                     : const Text("Register Company"),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
