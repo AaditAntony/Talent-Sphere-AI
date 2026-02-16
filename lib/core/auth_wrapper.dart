@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:talent_phere_ai/company/company_dashboard_page.dart';
 import 'package:talent_phere_ai/company/company_profile_setup.dart';
 import 'package:talent_phere_ai/company/waiting_approval_screen.dart';
 
