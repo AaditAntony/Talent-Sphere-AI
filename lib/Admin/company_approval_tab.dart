@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talent_phere_ai/Admin/company_detail_page.dart';
@@ -11,55 +10,46 @@ class CompanyApprovalTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('companies')
+          .collection('users')
+          .where('role', isEqualTo: 'company')
+          .where('isProfileComplete', isEqualTo: true)
+          .where('isApproved', isEqualTo: false)
           .snapshots(),
-      builder: (context, snapshot) {
+      builder: (context, userSnapshot) {
 
-        if (!snapshot.hasData) {
+        if (!userSnapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final companies = snapshot.data!.docs;
+        final pendingUsers = userSnapshot.data!.docs;
 
-        if (companies.isEmpty) {
-          return const Center(child: Text("No Companies Found"));
+        if (pendingUsers.isEmpty) {
+          return const Center(child: Text("No Pending Companies"));
         }
 
         return ListView.builder(
           padding: const EdgeInsets.all(20),
-          itemCount: companies.length,
+          itemCount: pendingUsers.length,
           itemBuilder: (context, index) {
 
-            final companyDoc = companies[index];
-            final companyId = companyDoc.id;
-            final companyData =
-                companyDoc.data() as Map<String, dynamic>;
+            final userDoc = pendingUsers[index];
+            final companyId = userDoc.id;
 
             return FutureBuilder<DocumentSnapshot>(
               future: FirebaseFirestore.instance
-                  .collection('users')
+                  .collection('companies')
                   .doc(companyId)
                   .get(),
-              builder: (context, userSnapshot) {
+              builder: (context, companySnapshot) {
 
-                if (!userSnapshot.hasData) {
+                if (!companySnapshot.hasData ||
+                    !companySnapshot.data!.exists) {
                   return const SizedBox();
                 }
 
-                final userData =
-                    userSnapshot.data!.data() as Map<String, dynamic>;
-
-                final isApproved = userData['isApproved'] ?? false;
-                final isProfileComplete =
-                    userData['isProfileComplete'] ?? false;
-                final role = userData['role'];
-
-                // Show only pending companies
-                if (role != "company" ||
-                    !isProfileComplete ||
-                    isApproved) {
-                  return const SizedBox();
-                }
+                final companyData =
+                companySnapshot.data!.data()
+                as Map<String, dynamic>;
 
                 return Card(
                   elevation: 4,
@@ -69,11 +59,12 @@ class CompanyApprovalTab extends StatelessWidget {
                   ),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: companyData['profileImage'] != null
+                      backgroundImage:
+                      companyData['profileImage'] != null
                           ? MemoryImage(
-                              base64Decode(
-                                  companyData['profileImage']),
-                            )
+                        base64Decode(
+                            companyData['profileImage']),
+                      )
                           : null,
                       child: companyData['profileImage'] == null
                           ? const Icon(Icons.business)
@@ -85,8 +76,9 @@ class CompanyApprovalTab extends StatelessWidget {
                           fontWeight: FontWeight.bold),
                     ),
                     subtitle:
-                        Text(companyData['address'] ?? ""),
-                    trailing: const Icon(Icons.arrow_forward_ios),
+                    Text(companyData['address'] ?? ""),
+                    trailing:
+                    const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -108,4 +100,3 @@ class CompanyApprovalTab extends StatelessWidget {
     );
   }
 }
-// the code is modified 
