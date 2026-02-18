@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talent_phere_ai/core/login_page.dart';
-
+// import 'company_dashboard_page.dart';
 
 class WaitingApprovalPage extends StatelessWidget {
   const WaitingApprovalPage({super.key});
@@ -20,34 +20,66 @@ class WaitingApprovalPage extends StatelessWidget {
             .snapshots(),
         builder: (context, snapshot) {
 
-          if (!snapshot.hasData) {
+          // Loading state
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final data = snapshot.data!;
-          final isApproved = data['isApproved'] ?? false;
+          // 🔴 If no document (Rejected by admin)
+          if (!snapshot.hasData ||
+              !snapshot.data!.exists ||
+              snapshot.data!.data() == null) {
 
-          // 🔥 If approved, automatically move to dashboard
-          if (isApproved == true) {
-           // return const CompanyDashboardPage();
+            Future.microtask(() async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+                (route) => false,
+              );
+            });
+
+            return const SizedBox();
           }
 
-          return Center(
+          // Safe cast
+          final data =
+              snapshot.data!.data() as Map<String, dynamic>;
+
+          final isApproved = data['isApproved'] ?? false;
+
+          // 🟢 If approved
+          if (isApproved == true) {
+
+            Future.microtask(() {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const LoginPage(), // change to dashboard later
+                ),
+              );
+            });
+
+            return const SizedBox();
+          }
+
+          // 🟡 Still waiting
+          return const Center(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
 
-                  const Icon(
+                  Icon(
                     Icons.hourglass_top,
                     size: 80,
                     color: Colors.orange,
                   ),
 
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
 
-                  const Text(
+                  Text(
                     "Profile Submitted Successfully!",
                     style: TextStyle(
                       fontSize: 20,
@@ -56,26 +88,11 @@ class WaitingApprovalPage extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
 
-                  const SizedBox(height: 15),
+                  SizedBox(height: 15),
 
-                  const Text(
+                  Text(
                     "Your company profile is under review.\nPlease wait for admin approval.",
                     textAlign: TextAlign.center,
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  ElevatedButton(
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const LoginPage()),
-                        (route) => false,
-                      );
-                    },
-                    child: const Text("Logout"),
                   ),
                 ],
               ),
