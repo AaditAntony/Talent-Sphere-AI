@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:talent_phere_ai/user/user_job_detailed_page.dart';
 
 class UserJobListingPage extends StatelessWidget {
   const UserJobListingPage({super.key});
@@ -94,15 +95,15 @@ class UserJobListingPage extends StatelessWidget {
                       trailing: const Icon(
                           Icons.arrow_forward_ios),
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (_) =>
-                        //         UserJobDetailPage(
-                        //       jobData: jobData,
-                        //     ),
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                UserJobDetailPage(
+                              jobData: jobData,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   );
