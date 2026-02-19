@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'company_post_job_page.dart';
+import 'company_overview_page.dart';
+import 'company_application_page.dart';
+import 'company_profile_page.dart';
+import 'company_my_job_page.dart';
 
 class CompanyDashboardPage extends StatefulWidget {
   const CompanyDashboardPage({super.key});
