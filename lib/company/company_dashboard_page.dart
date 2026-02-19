@@ -40,7 +40,7 @@ class CompanyDashboardPage extends StatelessWidget {
               icon: Icons.add_circle,
               title: "Post Job",
               onTap: () {
-                // Navigate to Post Job page
+                // Navigate to Post Job page done
                 Navigator.push(
                   context,
                   MaterialPageRoute(
