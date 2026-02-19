@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:talent_phere_ai/core/login_page.dart';
+import 'package:talent_phere_ai/company/company_post_job_page.dart';
 
 
 class CompanyDashboardPage extends StatelessWidget {
@@ -40,6 +41,13 @@ class CompanyDashboardPage extends StatelessWidget {
               title: "Post Job",
               onTap: () {
                 // Navigate to Post Job page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CompanyPostJobPage(),
+                  ),
+                );
+
               },
             ),
 
