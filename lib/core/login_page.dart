@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:talent_phere_ai/company/company_signup_page.dart';
+import 'package:talent_phere_ai/user/user_signup_page.dart';
 import 'auth_wrapper.dart';
 // import 'company_signup_page.dart';
 // import 'user_signup_page.dart';
@@ -13,18 +14,15 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   bool isLoading = false;
 
   Future<void> login() async {
-
     setState(() => isLoading = true);
 
     try {
-
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
@@ -32,14 +30,12 @@ class _LoginPageState extends State<LoginPage> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const AuthWrapper(),
-        ),
+        MaterialPageRoute(builder: (_) => const AuthWrapper()),
       );
-
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
 
     setState(() => isLoading = false);
@@ -47,22 +43,17 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-
             const SizedBox(height: 100),
 
             const Text(
               "TalentSphereAI Login",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 30),
@@ -98,19 +89,15 @@ class _LoginPageState extends State<LoginPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
-                // TextButton(
-                //   onPressed: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (_) => const UserSignUpPage(),
-                //       ),
-                //     );
-                //   },
-                //   child: const Text("User Register"),
-                
-                // ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const UserSignUpPage()),
+                    );
+                  },
+                  child: const Text("Register as User"),
+                ),
 
                 TextButton(
                   onPressed: () {
