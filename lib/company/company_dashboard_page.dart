@@ -1,11 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:talent_phere_ai/core/login_page.dart';
-import 'package:talent_phere_ai/company/company_post_job_page.dart';
+import 'company_post_job_page.dart';
 
-
-class CompanyDashboardPage extends StatelessWidget {
+class CompanyDashboardPage extends StatefulWidget {
   const CompanyDashboardPage({super.key});
+
+  @override
+  State<CompanyDashboardPage> createState() =>
+      _CompanyDashboardPageState();
+}
+
+class _CompanyDashboardPageState
+    extends State<CompanyDashboardPage> {
+
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = const [
+    CompanyOverviewPage(),
+    CompanyMyJobsPage(),
+    CompanyApplicationsPage(),
+    CompanyProfilePage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,102 +33,51 @@ class CompanyDashboardPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Company Dashboard"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                (route) => false,
-              );
-            },
+      ),
+
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const CompanyPostJobPage(),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: "Overview",
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.work),
+            label: "My Jobs",
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: "Applications",
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Profile",
           ),
         ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 15,
-          children: [
-
-            _dashboardCard(
-              context,
-              icon: Icons.add_circle,
-              title: "Post Job",
-              onTap: () {
-                // Navigate to Post Job page done
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CompanyPostJobPage(),
-                  ),
-                );
-
-              },
-            ),
-
-            _dashboardCard(
-              context,
-              icon: Icons.work,
-              title: "My Jobs",
-              onTap: () {
-                // Navigate to Manage Jobs page
-              },
-            ),
-
-            _dashboardCard(
-              context,
-              icon: Icons.people,
-              title: "Applications",
-              onTap: () {
-                // Navigate to Applications page
-              },
-            ),
-
-            _dashboardCard(
-              context,
-              icon: Icons.business,
-              title: "Company Profile",
-              onTap: () {
-                // Navigate to Profile page
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _dashboardCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: Colors.blue.shade50,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.blue),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
