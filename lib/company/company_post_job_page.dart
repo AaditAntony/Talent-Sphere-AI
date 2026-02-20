@@ -42,11 +42,41 @@ class _CompanyPostJobPageState
       final companyId =
           FirebaseAuth.instance.currentUser!.uid;
 
+      // 🔹 Fetch company details
+      final companyDoc =
+      await FirebaseFirestore.instance
+          .collection('companies')
+          .doc(companyId)
+          .get();
+
+      if (!companyDoc.exists) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Company profile not found"),
+          ),
+        );
+        setState(() => isLoading = false);
+        return;
+      }
+
+      final companyData =
+      companyDoc.data() as Map<String, dynamic>;
+
+      final companyName =
+          companyData['name'] ?? "Company";
+
+      final companyLogo =
+          companyData['profileImage'] ?? "";
+
+      // 🔹 Save job with company info
       await FirebaseFirestore.instance
           .collection('jobs')
           .add({
 
         "companyId": companyId,
+        "companyName": companyName,
+        "companyLogo": companyLogo,
+
         "title": titleController.text.trim(),
         "description":
         descriptionController.text.trim(),
