@@ -10,13 +10,10 @@ class UserProfileSetupPage extends StatefulWidget {
   const UserProfileSetupPage({super.key});
 
   @override
-  State<UserProfileSetupPage> createState() =>
-      _UserProfileSetupPageState();
+  State<UserProfileSetupPage> createState() => _UserProfileSetupPageState();
 }
 
-class _UserProfileSetupPageState
-    extends State<UserProfileSetupPage> {
-
+class _UserProfileSetupPageState extends State<UserProfileSetupPage> {
   final _formKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
@@ -38,8 +35,7 @@ class _UserProfileSetupPageState
   // ---------------- PROFILE IMAGE PICKER ----------------
 
   Future<void> pickProfileImage() async {
-    FilePickerResult? result =
-    await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png'],
       withData: true,
@@ -50,9 +46,7 @@ class _UserProfileSetupPageState
 
       if (bytes.length > 300 * 1024) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Image must be below 300 KB"),
-          ),
+          const SnackBar(content: Text("Image must be below 300 KB")),
         );
         return;
       }
@@ -67,14 +61,9 @@ class _UserProfileSetupPageState
   // ---------------- RESUME PICKER ----------------
 
   Future<void> pickResume() async {
-    FilePickerResult? result =
-    await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: [
-        'pdf',
-        'doc',
-        'docx'
-      ],
+      allowedExtensions: ['pdf', 'doc', 'docx'],
       withData: true,
     );
 
@@ -83,9 +72,7 @@ class _UserProfileSetupPageState
 
       if (bytes.length > 300 * 1024) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Resume must be below 300 KB"),
-          ),
+          const SnackBar(content: Text("Resume must be below 300 KB")),
         );
         return;
       }
@@ -100,43 +87,35 @@ class _UserProfileSetupPageState
   // ---------------- SAVE PROFILE ----------------
 
   Future<void> saveProfile() async {
-
-    if (!_formKey.currentState!.validate())
-      return;
+    if (!_formKey.currentState!.validate()) return;
 
     if (profileImageBase64 == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Upload profile image"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Upload profile image")));
       return;
     }
 
     if (resumeBase64 == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Upload resume"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Upload resume")));
       return;
     }
 
     setState(() => isLoading = true);
 
     try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
 
-      final uid =
-          FirebaseAuth.instance.currentUser!.uid;
-
-      await FirebaseFirestore.instance
-          .collection('userProfiles')
-          .doc(uid)
-          .set({
-
+      await FirebaseFirestore.instance.collection('userProfiles').doc(uid).set({
         "name": nameController.text.trim(),
         "phone": phoneController.text.trim(),
-        "skills": skillsController.text.trim(),
+        "skills": skillsController.text
+            .split(',')
+            .map((e) => e.trim().toLowerCase())
+            .where((e) => e.isNotEmpty)
+            .toList(),
         "education": educationController.text.trim(),
         "experience": experienceController.text.trim(),
         "profileImageBase64": profileImageBase64,
@@ -145,27 +124,19 @@ class _UserProfileSetupPageState
         "createdAt": Timestamp.now(),
       });
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .update({
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
         "isProfileComplete": true,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-          Text("Profile Completed Successfully"),
-        ),
+        const SnackBar(content: Text("Profile Completed Successfully")),
       );
 
       Navigator.pop(context);
-
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
 
     setState(() => isLoading = false);
@@ -175,18 +146,14 @@ class _UserProfileSetupPageState
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Complete Your Profile"),
-      ),
+      appBar: AppBar(title: const Text("Complete Your Profile")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-
               const SizedBox(height: 20),
 
               // Profile Image
@@ -194,16 +161,11 @@ class _UserProfileSetupPageState
                 onTap: pickProfileImage,
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage:
-                  profileImageBytes != null
-                      ? MemoryImage(
-                      profileImageBytes!)
+                  backgroundImage: profileImageBytes != null
+                      ? MemoryImage(profileImageBytes!)
                       : null,
                   child: profileImageBytes == null
-                      ? const Icon(
-                    Icons.person,
-                    size: 40,
-                  )
+                      ? const Icon(Icons.person, size: 40)
                       : null,
                 ),
               ),
@@ -215,95 +177,64 @@ class _UserProfileSetupPageState
 
               TextFormField(
                 controller: nameController,
-                decoration:
-                const InputDecoration(
-                    labelText: "Full Name"),
-                validator: (v) =>
-                v!.isEmpty
-                    ? "Enter full name"
-                    : null,
+                decoration: const InputDecoration(labelText: "Full Name"),
+                validator: (v) => v!.isEmpty ? "Enter full name" : null,
               ),
 
               const SizedBox(height: 15),
 
               TextFormField(
                 controller: phoneController,
-                decoration:
-                const InputDecoration(
-                    labelText: "Phone Number"),
-                validator: (v) =>
-                v!.isEmpty
-                    ? "Enter phone number"
-                    : null,
+                decoration: const InputDecoration(labelText: "Phone Number"),
+                validator: (v) => v!.isEmpty ? "Enter phone number" : null,
               ),
 
               const SizedBox(height: 15),
 
               TextFormField(
                 controller: skillsController,
-                decoration:
-                const InputDecoration(
-                    labelText: "Skills"),
-                validator: (v) =>
-                v!.isEmpty
-                    ? "Enter skills"
-                    : null,
+                decoration: const InputDecoration(labelText: "Skills"),
+                validator: (v) => v!.isEmpty ? "Enter skills" : null,
               ),
 
               const SizedBox(height: 15),
 
               TextFormField(
                 controller: educationController,
-                decoration:
-                const InputDecoration(
-                    labelText: "Education"),
-                validator: (v) =>
-                v!.isEmpty
-                    ? "Enter education"
-                    : null,
+                decoration: const InputDecoration(labelText: "Education"),
+                validator: (v) => v!.isEmpty ? "Enter education" : null,
               ),
 
               const SizedBox(height: 15),
 
               TextFormField(
                 controller: experienceController,
-                decoration:
-                const InputDecoration(
-                    labelText: "Experience"),
-                validator: (v) =>
-                v!.isEmpty
-                    ? "Enter experience"
-                    : null,
+                decoration: const InputDecoration(labelText: "Experience"),
+                validator: (v) => v!.isEmpty ? "Enter experience" : null,
               ),
 
               const SizedBox(height: 20),
 
               ElevatedButton(
                 onPressed: pickResume,
-                child: const Text(
-                    "Upload Resume (PDF/DOC)"),
+                child: const Text("Upload Resume (PDF/DOC)"),
               ),
 
               if (resumeFileName != null)
                 Padding(
-                  padding:
-                  const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.only(top: 8),
                   child: Text(
                     resumeFileName!,
-                    style: const TextStyle(
-                        color: Colors.green),
+                    style: const TextStyle(color: Colors.green),
                   ),
                 ),
 
               const SizedBox(height: 30),
 
               ElevatedButton(
-                onPressed:
-                isLoading ? null : saveProfile,
+                onPressed: isLoading ? null : saveProfile,
                 child: isLoading
-                    ? const CircularProgressIndicator(
-                  color: Colors.white,
-                )
+                    ? const CircularProgressIndicator(color: Colors.white)
                     : const Text("Save Profile"),
               ),
             ],
