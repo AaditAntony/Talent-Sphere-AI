@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talent_phere_ai/user/user_job_detailed_page.dart';
@@ -68,6 +70,10 @@ class UserJobListingPage extends StatelessWidget {
                     return const SizedBox();
                   }
 
+                  final companyInfo =
+                  companySnapshot.data!.data()
+                  as Map<String, dynamic>;
+
                   return Card(
                     elevation: 5,
                     margin: const EdgeInsets.only(bottom: 18),
@@ -91,6 +97,38 @@ class UserJobListingPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+
+                            // 🔹 Company Row
+                            Row(
+                              children: [
+
+                                // Company Logo
+                                companyInfo['profileImage'] != null
+                                    ? CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: MemoryImage(
+                                    base64Decode(
+                                        companyInfo['profileImage']),
+                                  ),
+                                )
+                                    : const CircleAvatar(
+                                  radius: 20,
+                                  child: Icon(Icons.business),
+                                ),
+
+                                const SizedBox(width: 10),
+
+                                // Company Name
+                                Text(
+                                  companyInfo['name'] ?? "Company",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 15),
 
                             // 🔹 Job Title
                             Text(
@@ -148,24 +186,12 @@ class UserJobListingPage extends StatelessWidget {
 
                             const SizedBox(height: 10),
 
-                            // 🔹 Required Skills (limited to 2 lines)
                             Text(
                               "Skills: ${jobData['requiredSkills'] ?? ""}",
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: Colors.black87,
-                              ),
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            // 🔹 Posted Date
-                            Text(
-                              "Posted recently",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade600,
                               ),
                             ),
                           ],
