@@ -70,9 +70,12 @@ class UserJobListingPage extends StatelessWidget {
                     return const SizedBox();
                   }
 
-                  final companyInfo =
-                  companySnapshot.data!.data()
-                  as Map<String, dynamic>;
+
+                  final companyName =
+                      jobData['companyName'] ?? "Company";
+
+                  final companyLogo =
+                  jobData['companyLogo'];
 
                   return Card(
                     elevation: 5,
@@ -86,43 +89,45 @@ class UserJobListingPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => UserJobDetailPage(
-                              jobData: jobData,
-                            ),
+                            builder: (_) =>
+                                UserJobDetailPage(jobData: jobData),
                           ),
                         );
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(18),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
                           children: [
 
                             // 🔹 Company Row
                             Row(
                               children: [
 
-                                // Company Logo
-                                companyInfo['profileImage'] != null
+                                companyLogo != null &&
+                                    companyLogo != ""
                                     ? CircleAvatar(
                                   radius: 20,
-                                  backgroundImage: MemoryImage(
+                                  backgroundImage:
+                                  MemoryImage(
                                     base64Decode(
-                                        companyInfo['profileImage']),
+                                        companyLogo),
                                   ),
                                 )
                                     : const CircleAvatar(
                                   radius: 20,
-                                  child: Icon(Icons.business),
+                                  child:
+                                  Icon(Icons.business),
                                 ),
 
                                 const SizedBox(width: 10),
 
-                                // Company Name
                                 Text(
-                                  companyInfo['name'] ?? "Company",
+                                  companyName,
                                   style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight:
+                                    FontWeight.w600,
                                   ),
                                 ),
                               ],
@@ -130,70 +135,21 @@ class UserJobListingPage extends StatelessWidget {
 
                             const SizedBox(height: 15),
 
-                            // 🔹 Job Title
                             Text(
                               jobData['title'] ?? "",
                               style: const TextStyle(
                                 fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                fontWeight:
+                                FontWeight.bold,
                               ),
                             ),
 
                             const SizedBox(height: 8),
 
-                            // 🔹 Job Type Badge
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.withOpacity(0.1),
-                                borderRadius:
-                                BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                jobData['jobType'] ?? "",
-                                style: const TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            // 🔹 Location & Salary
-                            Row(
-                              children: [
-                                const Icon(Icons.location_on,
-                                    size: 16, color: Colors.grey),
-                                const SizedBox(width: 4),
-                                Text(
-                                  jobData['location'] ?? "",
-                                  style:
-                                  const TextStyle(color: Colors.grey),
-                                ),
-                                const SizedBox(width: 15),
-                                const Icon(Icons.attach_money,
-                                    size: 16, color: Colors.grey),
-                                const SizedBox(width: 4),
-                                Text(
-                                  jobData['salary'] ?? "",
-                                  style:
-                                  const TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 10),
-
                             Text(
-                              "Skills: ${jobData['requiredSkills'] ?? ""}",
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.black87,
-                              ),
-                            ),
+                                "Location: ${jobData['location']}"),
+                            Text(
+                                "Salary: ${jobData['salary']}"),
                           ],
                         ),
                       ),
