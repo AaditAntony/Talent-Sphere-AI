@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talent_phere_ai/user/user_job_detailed_page.dart';
@@ -68,43 +70,133 @@ class UserJobListingPage extends StatelessWidget {
                     return const SizedBox();
                   }
 
+                  final companyInfo =
+                  companySnapshot.data!.data()
+                  as Map<String, dynamic>;
+
                   return Card(
-                    elevation: 4,
-                    margin: const EdgeInsets.only(bottom: 15),
+                    elevation: 5,
+                    margin: const EdgeInsets.only(bottom: 18),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: ListTile(
-                      title: Text(
-                        jobData['title'] ?? "",
-                        style: const TextStyle(
-                            fontWeight:
-                                FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              "Location: ${jobData['location'] ?? ""}"),
-                          Text(
-                              "Salary: ${jobData['salary'] ?? ""}"),
-                        ],
-                      ),
-                      trailing: const Icon(
-                          Icons.arrow_forward_ios),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                UserJobDetailPage(
+                            builder: (_) => UserJobDetailPage(
                               jobData: jobData,
                             ),
                           ),
                         );
                       },
+                      child: Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            // 🔹 Company Row
+                            Row(
+                              children: [
+
+                                // Company Logo
+                                companyInfo['profileImage'] != null
+                                    ? CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: MemoryImage(
+                                    base64Decode(
+                                        companyInfo['profileImage']),
+                                  ),
+                                )
+                                    : const CircleAvatar(
+                                  radius: 20,
+                                  child: Icon(Icons.business),
+                                ),
+
+                                const SizedBox(width: 10),
+
+                                // Company Name
+                                Text(
+                                  companyInfo['name'] ?? "Company",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 15),
+
+                            // 🔹 Job Title
+                            Text(
+                              jobData['title'] ?? "",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            // 🔹 Job Type Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius:
+                                BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                jobData['jobType'] ?? "",
+                                style: const TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            // 🔹 Location & Salary
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on,
+                                    size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(
+                                  jobData['location'] ?? "",
+                                  style:
+                                  const TextStyle(color: Colors.grey),
+                                ),
+                                const SizedBox(width: 15),
+                                const Icon(Icons.attach_money,
+                                    size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(
+                                  jobData['salary'] ?? "",
+                                  style:
+                                  const TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            Text(
+                              "Skills: ${jobData['requiredSkills'] ?? ""}",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 },
