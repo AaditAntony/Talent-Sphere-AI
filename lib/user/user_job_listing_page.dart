@@ -69,42 +69,108 @@ class UserJobListingPage extends StatelessWidget {
                   }
 
                   return Card(
-                    elevation: 4,
-                    margin: const EdgeInsets.only(bottom: 15),
+                    elevation: 5,
+                    margin: const EdgeInsets.only(bottom: 18),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: ListTile(
-                      title: Text(
-                        jobData['title'] ?? "",
-                        style: const TextStyle(
-                            fontWeight:
-                                FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              "Location: ${jobData['location'] ?? ""}"),
-                          Text(
-                              "Salary: ${jobData['salary'] ?? ""}"),
-                        ],
-                      ),
-                      trailing: const Icon(
-                          Icons.arrow_forward_ios),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                UserJobDetailPage(
+                            builder: (_) => UserJobDetailPage(
                               jobData: jobData,
                             ),
                           ),
                         );
                       },
+                      child: Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            // 🔹 Job Title
+                            Text(
+                              jobData['title'] ?? "",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            // 🔹 Job Type Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius:
+                                BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                jobData['jobType'] ?? "",
+                                style: const TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            // 🔹 Location & Salary
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on,
+                                    size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(
+                                  jobData['location'] ?? "",
+                                  style:
+                                  const TextStyle(color: Colors.grey),
+                                ),
+                                const SizedBox(width: 15),
+                                const Icon(Icons.attach_money,
+                                    size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(
+                                  jobData['salary'] ?? "",
+                                  style:
+                                  const TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            // 🔹 Required Skills (limited to 2 lines)
+                            Text(
+                              "Skills: ${jobData['requiredSkills'] ?? ""}",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black87,
+                              ),
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            // 🔹 Posted Date
+                            Text(
+                              "Posted recently",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 },
