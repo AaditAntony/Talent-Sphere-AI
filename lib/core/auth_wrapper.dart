@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talent_phere_ai/company/company_dashboard_page.dart';
 import 'package:talent_phere_ai/company/company_profile_setup.dart';
 import 'package:talent_phere_ai/company/waiting_approval_screen.dart';
+import 'package:talent_phere_ai/user/user_job_listing_page.dart';
 
 //import '../company/company_dashboard_page.dart';
 //import '../user/user_dashboard_page.dart';
@@ -48,7 +49,7 @@ class AuthWrapper extends StatelessWidget {
 
             // 🟢 USER FLOW
             if (role == "user") {
-              //return const UserDashboardPage();
+              return const UserJobListingPage();
             }
 
             // 🟣 COMPANY FLOW
