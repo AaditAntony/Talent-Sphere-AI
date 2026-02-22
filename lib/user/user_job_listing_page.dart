@@ -9,29 +9,20 @@ class UserJobListingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Available Jobs"),
-      ),
+      appBar: AppBar(title: const Text("Available Jobs")),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('jobs')
             .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
-
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
-            return const Center(
-                child: CircularProgressIndicator());
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           }
 
-          if (!snapshot.hasData ||
-              snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text("No Jobs Available"),
-            );
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text("No Jobs Available"));
           }
 
           final jobs = snapshot.data!.docs;
@@ -40,12 +31,9 @@ class UserJobListingPage extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             itemCount: jobs.length,
             itemBuilder: (context, index) {
-
               final jobDoc = jobs[index];
-              final jobData =
-                  jobDoc.data() as Map<String, dynamic>;
-              final companyId =
-                  jobData['companyId'];
+              final jobData = jobDoc.data() as Map<String, dynamic>;
+              final companyId = jobData['companyId'];
 
               return FutureBuilder<DocumentSnapshot>(
                 future: FirebaseFirestore.instance
@@ -53,29 +41,23 @@ class UserJobListingPage extends StatelessWidget {
                     .doc(companyId)
                     .get(),
                 builder: (context, companySnapshot) {
-
                   if (!companySnapshot.hasData ||
                       !companySnapshot.data!.exists) {
                     return const SizedBox();
                   }
 
                   final companyData =
-                      companySnapshot.data!.data()
-                          as Map<String, dynamic>;
+                      companySnapshot.data!.data() as Map<String, dynamic>;
 
-                  final isApproved =
-                      companyData['isApproved'] ?? false;
+                  final isApproved = companyData['isApproved'] ?? false;
 
                   if (!isApproved) {
                     return const SizedBox();
                   }
 
+                  final companyName = jobData['companyName'] ?? "Company";
 
-                  final companyName =
-                      jobData['companyName'] ?? "Company";
-
-                  final companyLogo =
-                  jobData['companyLogo'];
+                  final companyLogo = jobData['companyLogo'];
 
                   return Card(
                     elevation: 5,
@@ -89,45 +71,38 @@ class UserJobListingPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                UserJobDetailPage(jobData: jobData),
+                            builder: (_) => UserJobDetailPage(
+                              jobData: {...jobData, "jobId": jobDoc.id},
+                            ),
                           ),
                         );
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(18),
                         child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-
                             // 🔹 Company Row
                             Row(
                               children: [
-
-                                companyLogo != null &&
-                                    companyLogo != ""
+                                companyLogo != null && companyLogo != ""
                                     ? CircleAvatar(
-                                  radius: 20,
-                                  backgroundImage:
-                                  MemoryImage(
-                                    base64Decode(
-                                        companyLogo),
-                                  ),
-                                )
+                                        radius: 20,
+                                        backgroundImage: MemoryImage(
+                                          base64Decode(companyLogo),
+                                        ),
+                                      )
                                     : const CircleAvatar(
-                                  radius: 20,
-                                  child:
-                                  Icon(Icons.business),
-                                ),
+                                        radius: 20,
+                                        child: Icon(Icons.business),
+                                      ),
 
                                 const SizedBox(width: 10),
 
                                 Text(
                                   companyName,
                                   style: const TextStyle(
-                                    fontWeight:
-                                    FontWeight.w600,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],
@@ -139,17 +114,14 @@ class UserJobListingPage extends StatelessWidget {
                               jobData['title'] ?? "",
                               style: const TextStyle(
                                 fontSize: 18,
-                                fontWeight:
-                                FontWeight.bold,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
 
                             const SizedBox(height: 8),
 
-                            Text(
-                                "Location: ${jobData['location']}"),
-                            Text(
-                                "Salary: ${jobData['salary']}"),
+                            Text("Location: ${jobData['location']}"),
+                            Text("Salary: ${jobData['salary']}"),
                           ],
                         ),
                       ),
