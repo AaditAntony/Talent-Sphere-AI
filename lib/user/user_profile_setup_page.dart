@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:talent_phere_ai/user/user_job_listing_page.dart';
 
 class UserProfileSetupPage extends StatefulWidget {
   const UserProfileSetupPage({super.key});
@@ -132,7 +133,13 @@ class _UserProfileSetupPageState extends State<UserProfileSetupPage> {
         const SnackBar(content: Text("Profile Completed Successfully")),
       );
 
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(
+    builder: (_) => const UserJobListingPage(),
+  ),
+);
+
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -244,3 +251,4 @@ class _UserProfileSetupPageState extends State<UserProfileSetupPage> {
     );
   }
 }
+//working
