@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:talent_phere_ai/company/application_detailed_page.dart';
 
 class CompanyApplicationsPage extends StatelessWidget {
   const CompanyApplicationsPage({super.key});
@@ -103,6 +104,23 @@ class CompanyApplicationsPage extends StatelessWidget {
                       ),
 
                       const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ApplicantDetailPage(
+                                  applicationId: appDoc.id,
+                                  applicationData: appData,
+                                ),
+                              ),
+                            );
+                          },
+                          child: const Text("View Details"),
+                        ),
+                      ),
 
                       Text(
                         "Status: ${status.toUpperCase()}",
