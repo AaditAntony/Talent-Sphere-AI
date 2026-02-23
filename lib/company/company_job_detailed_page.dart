@@ -14,67 +14,45 @@ class CompanyJobDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final createdAt =
-    (jobData['createdAt'] as Timestamp).toDate();
+    final createdAt = (jobData['createdAt'] as Timestamp).toDate();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Job Details"),
-      ),
+      appBar: AppBar(title: const Text("Job Details")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment:
-          CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // Title
             Text(
               jobData['title'] ?? "",
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 10),
 
             // Job Type Badge
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.blue.withOpacity(0.1),
-                borderRadius:
-                BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 jobData['jobType'] ?? "",
-                style:
-                const TextStyle(color: Colors.blue),
+                style: const TextStyle(color: Colors.blue),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            Text(
-              "Location",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text("Location", style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 5),
             Text(jobData['location'] ?? ""),
 
             const SizedBox(height: 15),
 
-            Text(
-              "Salary",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text("Salary", style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 5),
             Text(jobData['salary'] ?? ""),
 
@@ -82,37 +60,30 @@ class CompanyJobDetailPage extends StatelessWidget {
 
             Text(
               "Required Skills",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            Text(jobData['requiredSkills'] ?? ""),
+            Wrap(
+              spacing: 6,
+              children: List<String>.from(
+                jobData['requiredSkills'] ?? [],
+              ).map((skill) => Chip(label: Text(skill))).toList(),
+            ),
 
             const SizedBox(height: 15),
 
             Text(
               "Job Description",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             Text(jobData['description'] ?? ""),
 
             const SizedBox(height: 20),
 
-            Text(
-              "Posted On",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text("Posted On", style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 5),
-            Text(
-              DateFormat('dd MMM yyyy, hh:mm a')
-                  .format(createdAt),
-            ),
+            Text(DateFormat('dd MMM yyyy, hh:mm a').format(createdAt)),
           ],
         ),
       ),
