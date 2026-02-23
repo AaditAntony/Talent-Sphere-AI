@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:talent_phere_ai/company/company_signup_page.dart';
+import 'package:talent_phere_ai/core/auth_wrapper.dart';
 import 'package:talent_phere_ai/user/user_signup_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -33,8 +34,14 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text.trim(),
       );
 
-      // 🔥 DO NOT navigate manually
-      // AuthWrapper will automatically redirect
+      if (!mounted) return;
+
+      // 🔥 Force rebuild through AuthWrapper
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const AuthWrapper()),
+        (route) => false,
+      );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
