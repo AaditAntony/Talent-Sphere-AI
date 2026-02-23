@@ -1,13 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:talent_phere_ai/Admin/user_detail_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UsersManagementTab extends StatelessWidget {
-  const UsersManagementTab({super.key});
+class UserManagementTab extends StatelessWidget {
+  const UserManagementTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+
+    return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('users')
           .where('role', isEqualTo: 'user')
@@ -15,13 +15,15 @@ class UsersManagementTab extends StatelessWidget {
       builder: (context, snapshot) {
 
         if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+              child: CircularProgressIndicator());
         }
 
         final users = snapshot.data!.docs;
 
         if (users.isEmpty) {
-          return const Center(child: Text("No Users Found"));
+          return const Center(
+              child: Text("No Users Found"));
         }
 
         return ListView.builder(
@@ -29,36 +31,45 @@ class UsersManagementTab extends StatelessWidget {
           itemCount: users.length,
           itemBuilder: (context, index) {
 
-            final data = users[index];
+            final userDoc = users[index];
+            final userData =
+                userDoc.data()
+                    as Map<String, dynamic>;
 
             return Card(
               elevation: 4,
-              margin: const EdgeInsets.only(bottom: 15),
+              margin:
+                  const EdgeInsets.only(bottom: 15),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius:
+                    BorderRadius.circular(12),
               ),
               child: ListTile(
                 leading: const CircleAvatar(
                   child: Icon(Icons.person),
                 ),
                 title: Text(
-                  data['name'] ?? "",
+                  userData['email'] ?? "",
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold),
+                      fontWeight:
+                          FontWeight.bold),
                 ),
-                subtitle: Text(data['email'] ?? ""),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => UserDetailPage(
-                        userId: data.id,
-                        userData: data.data(),
-                      ),
-                    ),
-                  );
-                },
+                subtitle: Text(
+                  "Profile Complete: ${userData['isProfileComplete'] ?? false}",
+                ),
+                trailing: IconButton(
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                  onPressed: () async {
+                    await FirebaseFirestore
+                        .instance
+                        .collection('users')
+                        .doc(userDoc.id)
+                        .delete();
+                  },
+                ),
               ),
             );
           },
