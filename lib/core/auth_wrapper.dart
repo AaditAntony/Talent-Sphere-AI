@@ -5,7 +5,7 @@ import 'package:talent_phere_ai/Admin/admin_dashboard.dart';
 import 'package:talent_phere_ai/user/user_dashboard_page.dart';
 
 import '../core/login_page.dart';
-import '../user/user_job_listing_page.dart';
+
 import '../user/user_profile_setup_page.dart';
 import '../company/company_dashboard_page.dart';
 

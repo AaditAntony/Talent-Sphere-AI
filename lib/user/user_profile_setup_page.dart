@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:talent_phere_ai/user/user_dashboard_page.dart';
-import 'package:talent_phere_ai/user/user_job_listing_page.dart';
+
 
 class UserProfileSetupPage extends StatefulWidget {
   const UserProfileSetupPage({super.key});
