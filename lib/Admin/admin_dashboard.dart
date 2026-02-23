@@ -30,7 +30,7 @@ class AdminDashboardPage extends StatelessWidget {
             AdminOverviewTab(),
             CompanyApprovalTab(),
             ApprovedCompanyTab(),
-            UsersManagementTab(),
+            UserManagementTab(),
             JobsMonitoringTab(),
           ],
         ),
