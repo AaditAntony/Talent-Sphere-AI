@@ -84,11 +84,12 @@ class CompanyMyJobsPage extends StatelessWidget {
 
                     const SizedBox(height: 8),
 
-                    Text(
-                      "Skills: ${jobData['requiredSkills'] ?? ""}",
-                      style: const TextStyle(color: Colors.grey),
+                    Wrap(
+                      spacing: 6,
+                      children: List<String>.from(
+                        jobData['requiredSkills'] ?? [],
+                      ).map((skill) => Chip(label: Text(skill))).toList(),
                     ),
-
                     const SizedBox(height: 10),
 
                     Text(
