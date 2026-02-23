@@ -90,3 +90,4 @@ class CompanyJobDetailPage extends StatelessWidget {
     );
   }
 }
+// working on job details issue solved in the requeired skill
