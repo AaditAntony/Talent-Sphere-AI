@@ -172,3 +172,4 @@ class _CompanyPostJobPageState extends State<CompanyPostJobPage> {
     );
   }
 }
+// solved the issue
