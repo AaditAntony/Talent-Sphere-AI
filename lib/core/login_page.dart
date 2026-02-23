@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:talent_phere_ai/company/company_signup_page.dart';
 import 'package:talent_phere_ai/user/user_signup_page.dart';
-import 'auth_wrapper.dart';
-// import 'company_signup_page.dart';
-// import 'user_signup_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,6 +17,14 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
 
   Future<void> login() async {
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Enter email and password")));
+      return;
+    }
+
     setState(() => isLoading = true);
 
     try {
@@ -28,17 +33,42 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text.trim(),
       );
 
-      Navigator.pushReplacement(
+      // 🔥 DO NOT navigate manually
+      // AuthWrapper will automatically redirect
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String message = "Login failed";
+
+      if (e.code == 'user-not-found') {
+        message = "No user found with this email";
+      } else if (e.code == 'wrong-password') {
+        message = "Incorrect password";
+      } else if (e.code == 'invalid-email') {
+        message = "Invalid email format";
+      }
+
+      ScaffoldMessenger.of(
         context,
-        MaterialPageRoute(builder: (_) => const AuthWrapper()),
-      );
+      ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
 
-    setState(() => isLoading = false);
+    if (mounted) {
+      setState(() => isLoading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -60,24 +90,40 @@ class _LoginPageState extends State<LoginPage> {
 
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: "Email"),
+              decoration: const InputDecoration(
+                labelText: "Email",
+                border: OutlineInputBorder(),
+              ),
             ),
 
             const SizedBox(height: 15),
 
             TextField(
               controller: passwordController,
-              decoration: const InputDecoration(labelText: "Password"),
+              decoration: const InputDecoration(
+                labelText: "Password",
+                border: OutlineInputBorder(),
+              ),
               obscureText: true,
             ),
 
             const SizedBox(height: 25),
 
-            ElevatedButton(
-              onPressed: isLoading ? null : login,
-              child: isLoading
-                  ? const CircularProgressIndicator()
-                  : const Text("Login"),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isLoading ? null : login,
+                child: isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text("Login"),
+              ),
             ),
 
             const SizedBox(height: 20),

@@ -35,6 +35,12 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
             _currentIndex = index;
           });
         },
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        elevation: 10,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.work), label: "Jobs"),
           BottomNavigationBarItem(icon: Icon(Icons.auto_awesome), label: "AI"),
@@ -42,7 +48,6 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
             icon: Icon(Icons.assignment),
             label: "My Applications",
           ),
-
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
