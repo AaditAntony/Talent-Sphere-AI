@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:talent_phere_ai/user/user_ai_recommended_page.dart';
 import 'package:talent_phere_ai/user/user_my_applciation_page.dart';
 
 import 'user_job_listing_page.dart';
@@ -17,6 +18,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
 
   final List<Widget> _pages = const [
     UserJobListingPage(),
+    UserAIRecommendedPage(),
     UserMyApplicationsPage(),
     UserProfileViewPage(),
   ];
@@ -35,7 +37,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.work), label: "Jobs"),
-
+          BottomNavigationBarItem(icon: Icon(Icons.auto_awesome), label: "AI"),
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment),
             label: "My Applications",
