@@ -140,7 +140,6 @@ class CompanyApplicationsPage extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (_) => ApplicantDetailPage(
                                   applicationId: appDoc.id,
-                                  applicationData: appData,
                                 ),
                               ),
                             );
