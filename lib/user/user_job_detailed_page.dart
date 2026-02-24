@@ -17,7 +17,7 @@ class UserJobDetailPage extends StatelessWidget {
     final companyId = jobData['companyId'];
 
     try {
-      // 🔹 Prevent duplicate applications
+      // 🔍 Prevent duplicate
       final existing = await FirebaseFirestore.instance
           .collection('applications')
           .where('jobId', isEqualTo: jobId)
@@ -25,22 +25,22 @@ class UserJobDetailPage extends StatelessWidget {
           .get();
 
       if (existing.docs.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("You already applied to this job")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("You already applied")));
         return;
       }
 
-      // 🔹 Fetch user profile
+      // 🔥 Fetch user profile
       final profileDoc = await FirebaseFirestore.instance
           .collection('userProfiles')
           .doc(userId)
           .get();
 
       if (!profileDoc.exists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Complete your profile first")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Complete profile first")));
         return;
       }
 
@@ -51,19 +51,23 @@ class UserJobDetailPage extends StatelessWidget {
         "jobTitle": jobData['title'],
         "companyId": companyId,
         "companyName": jobData['companyName'],
+
         "userId": userId,
         "userEmail": user.email,
         "userName": profileData['name'],
         "userSkills": profileData['skills'],
-        "userProfileImage": profileData['profileImage'],
-        "resumeBase64": profileData['resume'],
+        "userProfileImage": profileData['profileImageBase64'],
+
+        // 🔥 IMPORTANT FIELD
+        "resumeBase64": profileData['resumeBase64'],
+
         "status": "pending",
         "appliedAt": Timestamp.now(),
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Application Submitted Successfully")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Application Submitted")));
     } catch (e) {
       ScaffoldMessenger.of(
         context,
