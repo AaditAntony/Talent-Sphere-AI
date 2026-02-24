@@ -36,32 +36,17 @@ class _CompanyPostJobPageState extends State<CompanyPostJobPage> {
     try {
       final companyId = FirebaseAuth.instance.currentUser!.uid;
 
-      // 🔹 Fetch company details
       final companyDoc = await FirebaseFirestore.instance
           .collection('companies')
           .doc(companyId)
           .get();
 
-      if (!companyDoc.exists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Company profile not found")),
-        );
-        setState(() => isLoading = false);
-        return;
-      }
-
       final companyData = companyDoc.data() as Map<String, dynamic>;
 
-      final companyName = companyData['name'] ?? "Company";
-
-      final companyLogo = companyData['profileImage'] ?? "";
-
-      // 🔹 Save job with company info
       await FirebaseFirestore.instance.collection('jobs').add({
         "companyId": companyId,
-        "companyName": companyName,
-        "companyLogo": companyLogo,
-
+        "companyName": companyData['name'],
+        "companyLogo": companyData['profileImage'],
         "title": titleController.text.trim(),
         "description": descriptionController.text.trim(),
         "location": locationController.text.trim(),
@@ -80,6 +65,7 @@ class _CompanyPostJobPageState extends State<CompanyPostJobPage> {
       ).showSnackBar(const SnackBar(content: Text("Job Posted Successfully")));
 
       _formKey.currentState!.reset();
+      skillsController.clear();
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -89,61 +75,96 @@ class _CompanyPostJobPageState extends State<CompanyPostJobPage> {
     setState(() => isLoading = false);
   }
 
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Post New Job")),
+      backgroundColor: Colors.grey.shade50,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Text(
+                "Post a New Job",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 5),
+
+              const Text(
+                "Fill in the details below",
+                style: TextStyle(color: Colors.grey),
+              ),
+
+              const SizedBox(height: 25),
+
               TextFormField(
                 controller: titleController,
-                decoration: const InputDecoration(labelText: "Job Title"),
+                decoration: _inputDecoration("Job Title"),
                 validator: (v) => v!.isEmpty ? "Enter job title" : null,
               ),
 
-              const SizedBox(height: 15),
+              const SizedBox(height: 18),
 
               TextFormField(
                 controller: descriptionController,
-                decoration: const InputDecoration(labelText: "Job Description"),
                 maxLines: 4,
-                validator: (v) => v!.isEmpty ? "Enter job description" : null,
+                decoration: _inputDecoration("Job Description"),
+                validator: (v) => v!.isEmpty ? "Enter description" : null,
               ),
 
-              const SizedBox(height: 15),
+              const SizedBox(height: 18),
 
-              TextFormField(
-                controller: locationController,
-                decoration: const InputDecoration(labelText: "Location"),
-                validator: (v) => v!.isEmpty ? "Enter location" : null,
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: locationController,
+                      decoration: _inputDecoration("Location"),
+                      validator: (v) => v!.isEmpty ? "Enter location" : null,
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: TextFormField(
+                      controller: salaryController,
+                      decoration: _inputDecoration("Salary"),
+                      validator: (v) => v!.isEmpty ? "Enter salary" : null,
+                    ),
+                  ),
+                ],
               ),
 
-              const SizedBox(height: 15),
-
-              TextFormField(
-                controller: salaryController,
-                decoration: const InputDecoration(labelText: "Salary"),
-                validator: (v) => v!.isEmpty ? "Enter salary" : null,
-              ),
-
-              const SizedBox(height: 15),
+              const SizedBox(height: 18),
 
               TextFormField(
                 controller: skillsController,
-                decoration: const InputDecoration(labelText: "Required Skills"),
-                validator: (v) => v!.isEmpty ? "Enter required skills" : null,
+                decoration: _inputDecoration(
+                  "Required Skills (comma separated)",
+                ),
+                validator: (v) => v!.isEmpty ? "Enter skills" : null,
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
               DropdownButtonFormField<String>(
                 value: jobType,
-                decoration: const InputDecoration(labelText: "Job Type"),
+                decoration: _inputDecoration("Job Type"),
                 items: jobTypes
                     .map(
                       (type) =>
@@ -159,11 +180,24 @@ class _CompanyPostJobPageState extends State<CompanyPostJobPage> {
 
               const SizedBox(height: 30),
 
-              ElevatedButton(
-                onPressed: isLoading ? null : postJob,
-                child: isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text("Post Job"),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: isLoading ? null : postJob,
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          "Publish Job",
+                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.white),
+                        ),
+                ),
               ),
             ],
           ),
@@ -172,4 +206,3 @@ class _CompanyPostJobPageState extends State<CompanyPostJobPage> {
     );
   }
 }
-// solved the issue
