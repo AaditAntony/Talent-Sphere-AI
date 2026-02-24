@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:talent_phere_ai/user/user_edit_profile_page.dart';
 
 class UserProfileViewPage extends StatelessWidget {
   const UserProfileViewPage({super.key});
@@ -11,7 +12,21 @@ class UserProfileViewPage extends StatelessWidget {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("My Profile"), elevation: 0),
+      appBar: AppBar(
+        title: const Text("My Profile"),
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const UserEditProfilePage()),
+              );
+            },
+          ),
+        ],
+      ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
             .collection('userProfiles')
