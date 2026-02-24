@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:talent_phere_ai/user/user_dashboard_page.dart';
-
 
 class UserProfileSetupPage extends StatefulWidget {
   const UserProfileSetupPage({super.key});
@@ -24,17 +22,15 @@ class _UserProfileSetupPageState extends State<UserProfileSetupPage> {
   final educationController = TextEditingController();
   final experienceController = TextEditingController();
 
-  // Profile Image
   Uint8List? profileImageBytes;
   String? profileImageBase64;
 
-  // Resume
   String? resumeBase64;
   String? resumeFileName;
 
   bool isLoading = false;
 
-  // ---------------- PROFILE IMAGE PICKER ----------------
+  // ---------------- PROFILE IMAGE ----------------
 
   Future<void> pickProfileImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -60,12 +56,12 @@ class _UserProfileSetupPageState extends State<UserProfileSetupPage> {
     }
   }
 
-  // ---------------- RESUME PICKER ----------------
+  // ---------------- RESUME (PDF ONLY) ----------------
 
   Future<void> pickResume() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'docx'],
+      allowedExtensions: ['pdf'], // 🔥 ONLY PDF
       withData: true,
     );
 
@@ -130,21 +126,27 @@ class _UserProfileSetupPageState extends State<UserProfileSetupPage> {
         "isProfileComplete": true,
       });
 
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Profile Completed Successfully")),
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const UserDashboardPage()),
-      );
+      // 🔥 DO NOT navigate manually
+      // AuthWrapper will auto redirect
+
+      Navigator.pop(context);
     } catch (e) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
 
-    setState(() => isLoading = false);
+    if (mounted) {
+      setState(() => isLoading = false);
+    }
   }
 
   // ---------------- UI ----------------
@@ -161,7 +163,6 @@ class _UserProfileSetupPageState extends State<UserProfileSetupPage> {
             children: [
               const SizedBox(height: 20),
 
-              // Profile Image
               GestureDetector(
                 onTap: pickProfileImage,
                 child: CircleAvatar(
@@ -175,54 +176,22 @@ class _UserProfileSetupPageState extends State<UserProfileSetupPage> {
                 ),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               const Text("Tap to upload profile image"),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
 
-              TextFormField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: "Full Name"),
-                validator: (v) => v!.isEmpty ? "Enter full name" : null,
-              ),
-
-              const SizedBox(height: 15),
-
-              TextFormField(
-                controller: phoneController,
-                decoration: const InputDecoration(labelText: "Phone Number"),
-                validator: (v) => v!.isEmpty ? "Enter phone number" : null,
-              ),
-
-              const SizedBox(height: 15),
-
-              TextFormField(
-                controller: skillsController,
-                decoration: const InputDecoration(labelText: "Skills"),
-                validator: (v) => v!.isEmpty ? "Enter skills" : null,
-              ),
-
-              const SizedBox(height: 15),
-
-              TextFormField(
-                controller: educationController,
-                decoration: const InputDecoration(labelText: "Education"),
-                validator: (v) => v!.isEmpty ? "Enter education" : null,
-              ),
-
-              const SizedBox(height: 15),
-
-              TextFormField(
-                controller: experienceController,
-                decoration: const InputDecoration(labelText: "Experience"),
-                validator: (v) => v!.isEmpty ? "Enter experience" : null,
-              ),
+              _buildField(nameController, "Full Name"),
+              _buildField(phoneController, "Phone Number"),
+              _buildField(skillsController, "Skills (comma separated)"),
+              _buildField(educationController, "Education"),
+              _buildField(experienceController, "Experience"),
 
               const SizedBox(height: 20),
 
               ElevatedButton(
                 onPressed: pickResume,
-                child: const Text("Upload Resume (PDF/DOC)"),
+                child: const Text("Upload Resume (PDF Only)"),
               ),
 
               if (resumeFileName != null)
@@ -236,11 +205,14 @@ class _UserProfileSetupPageState extends State<UserProfileSetupPage> {
 
               const SizedBox(height: 30),
 
-              ElevatedButton(
-                onPressed: isLoading ? null : saveProfile,
-                child: isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Save Profile"),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : saveProfile,
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text("Save Profile"),
+                ),
               ),
             ],
           ),
@@ -248,5 +220,15 @@ class _UserProfileSetupPageState extends State<UserProfileSetupPage> {
       ),
     );
   }
+
+  Widget _buildField(TextEditingController controller, String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(labelText: label),
+        validator: (v) => v!.isEmpty ? "Enter $label" : null,
+      ),
+    );
+  }
 }
-//working
