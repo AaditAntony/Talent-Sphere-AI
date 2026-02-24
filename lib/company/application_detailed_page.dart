@@ -70,3 +70,4 @@ class ApplicantDetailPage extends StatelessWidget {
     );
   }
 }
+// resume fixed

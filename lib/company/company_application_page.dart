@@ -71,3 +71,4 @@ class CompanyApplicationsPage extends StatelessWidget {
     );
   }
 }
+// resume fixed
