@@ -46,53 +46,19 @@ class AdminOverviewTab extends StatelessWidget {
         final data = snapshot.data as List<int>;
 
         return Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(30),
           child: GridView.count(
             crossAxisCount: 3,
-            crossAxisSpacing: 15,
-            mainAxisSpacing: 15,
+            crossAxisSpacing: 25,
+            mainAxisSpacing: 25,
+            childAspectRatio: 1.5,
             children: [
-              buildCard(
-                "Total Users",
-                data[0].toString(),
-                Icons.people,
-                Colors.blue,
-              ),
-
-              buildCard(
-                "Total Companies",
-                data[1].toString(),
-                Icons.business,
-                Colors.purple,
-              ),
-
-              buildCard(
-                "Approved Companies",
-                data[2].toString(),
-                Icons.verified,
-                Colors.green,
-              ),
-
-              buildCard(
-                "Total Jobs",
-                data[3].toString(),
-                Icons.work,
-                Colors.orange,
-              ),
-
-              buildCard(
-                "Applications",
-                data[4].toString(),
-                Icons.description,
-                Colors.teal,
-              ),
-
-              buildCard(
-                "Pending Approvals",
-                data[5].toString(),
-                Icons.hourglass_top,
-                Colors.red,
-              ),
+              buildCard("Total Users", data[0], Icons.people_outline),
+              buildCard("Total Companies", data[1], Icons.business_outlined),
+              buildCard("Approved Companies", data[2], Icons.verified_outlined),
+              buildCard("Total Jobs", data[3], Icons.work_outline),
+              buildCard("Applications", data[4], Icons.description_outlined),
+              buildCard("Pending Approvals", data[5], Icons.hourglass_empty),
             ],
           ),
         );
@@ -100,23 +66,52 @@ class AdminOverviewTab extends StatelessWidget {
     );
   }
 
-  Widget buildCard(String title, String value, IconData icon, Color color) {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  Widget buildCard(String title, int value, IconData icon) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 15,
+            offset: const Offset(0, 6),
+            color: Colors.black.withOpacity(0.05),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: color),
-            const SizedBox(height: 10),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            // Top Icon
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2563EB).withOpacity(0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, size: 22, color: const Color(0xFF2563EB)),
             ),
-            const SizedBox(height: 5),
-            Text(title, textAlign: TextAlign.center),
+
+            const SizedBox(height: 18),
+
+            Text(
+              value.toString(),
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1E293B),
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Text(
+              title,
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
+            ),
           ],
         ),
       ),
