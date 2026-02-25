@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class CompanyAnalyticsPage extends StatelessWidget {
   const CompanyAnalyticsPage({super.key});
@@ -32,7 +33,7 @@ class CompanyAnalyticsPage extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // 🔥 Metrics Grid
+                // ================= METRIC CARDS =================
                 GridView.count(
                   shrinkWrap: true,
                   crossAxisCount: 2,
@@ -41,14 +42,11 @@ class CompanyAnalyticsPage extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   childAspectRatio: 1.4,
                   children: [
-                    _metricCard("Total Jobs", data['totalJobs'].toString()),
-                    _metricCard(
-                      "Total Applications",
-                      data['totalApplications'].toString(),
-                    ),
-                    _metricCard("Accepted", data['accepted'].toString()),
-                    _metricCard("Pending", data['pending'].toString()),
-                    _metricCard("Rejected", data['rejected'].toString()),
+                    _metricCard("Total Jobs", data['totalJobs']),
+                    _metricCard("Applications", data['totalApplications']),
+                    _metricCard("Accepted", data['accepted']),
+                    _metricCard("Pending", data['pending']),
+                    _metricCard("Rejected", data['rejected']),
                     _metricCard(
                       "Acceptance Rate",
                       "${data['acceptanceRate']}%",
@@ -58,6 +56,7 @@ class CompanyAnalyticsPage extends StatelessWidget {
 
                 const SizedBox(height: 30),
 
+                // ================= AI INSIGHT =================
                 const Text(
                   "AI Hiring Insight",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
@@ -69,17 +68,79 @@ class CompanyAnalyticsPage extends StatelessWidget {
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        blurRadius: 8,
+                        blurRadius: 10,
                         color: Colors.black.withOpacity(0.05),
                       ),
                     ],
                   ),
                   child: Text(
                     _generateInsight(data),
-                    style: const TextStyle(height: 1.4),
+                    style: const TextStyle(height: 1.5),
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                // ================= ANALYTICS OVERVIEW =================
+                const Text(
+                  "Analytics Overview",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+
+                const SizedBox(height: 20),
+
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 10,
+                        color: Colors.black.withOpacity(0.05),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // BAR CHART
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Applications per Job",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 15),
+                            SizedBox(height: 220, child: _buildBarChart(data)),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 25),
+
+                      // PIE CHART
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Status Distribution",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 15),
+                            SizedBox(height: 180, child: _buildPieChart(data)),
+                            const SizedBox(height: 15),
+                            _buildLegend(),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -111,7 +172,6 @@ class CompanyAnalyticsPage extends StatelessWidget {
     int pending = 0;
 
     Map<String, int> jobApplicationCount = {};
-    Map<String, int> skillFrequency = {};
 
     for (var doc in applicationsSnapshot.docs) {
       final data = doc.data();
@@ -123,30 +183,11 @@ class CompanyAnalyticsPage extends StatelessWidget {
 
       final jobTitle = data['jobTitle'] ?? "Unknown";
       jobApplicationCount[jobTitle] = (jobApplicationCount[jobTitle] ?? 0) + 1;
-
-      final skills = List<String>.from(data['userSkills'] ?? []);
-      for (var skill in skills) {
-        skillFrequency[skill] = (skillFrequency[skill] ?? 0) + 1;
-      }
     }
 
     double acceptanceRate = 0;
     if (totalApplications > 0) {
       acceptanceRate = (accepted / totalApplications) * 100;
-    }
-
-    String mostAppliedJob = "N/A";
-    if (jobApplicationCount.isNotEmpty) {
-      mostAppliedJob = jobApplicationCount.entries
-          .reduce((a, b) => a.value > b.value ? a : b)
-          .key;
-    }
-
-    String topSkill = "N/A";
-    if (skillFrequency.isNotEmpty) {
-      topSkill = skillFrequency.entries
-          .reduce((a, b) => a.value > b.value ? a : b)
-          .key;
     }
 
     return {
@@ -156,14 +197,13 @@ class CompanyAnalyticsPage extends StatelessWidget {
       "rejected": rejected,
       "pending": pending,
       "acceptanceRate": acceptanceRate.toInt(),
-      "mostAppliedJob": mostAppliedJob,
-      "topSkill": topSkill,
+      "jobApplicationCount": jobApplicationCount,
     };
   }
 
-  // ================= UI HELPERS =================
+  // ================= METRIC CARD =================
 
-  Widget _metricCard(String title, String value) {
+  Widget _metricCard(String title, dynamic value) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -177,7 +217,7 @@ class CompanyAnalyticsPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            value,
+            value.toString(),
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -191,19 +231,145 @@ class CompanyAnalyticsPage extends StatelessWidget {
     );
   }
 
+  // ================= BAR CHART =================
+
+  Widget _buildBarChart(Map<String, dynamic> data) {
+    final jobMap = Map<String, int>.from(data['jobApplicationCount']);
+
+    if (jobMap.isEmpty) {
+      return const Center(child: Text("No data"));
+    }
+
+    int index = 0;
+    final entries = jobMap.entries.toList();
+
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        borderData: FlBorderData(show: false),
+        gridData: FlGridData(show: true),
+        titlesData: FlTitlesData(
+          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                if (value.toInt() >= entries.length) {
+                  return const SizedBox();
+                }
+                return Text(
+                  entries[value.toInt()].key,
+                  style: const TextStyle(fontSize: 10),
+                );
+              },
+            ),
+          ),
+        ),
+        barGroups: entries.map((entry) {
+          final group = BarChartGroupData(
+            x: index++,
+            barRods: [
+              BarChartRodData(
+                toY: entry.value.toDouble(),
+                color: Colors.deepPurple,
+                width: 20,
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ],
+          );
+          return group;
+        }).toList(),
+      ),
+    );
+  }
+
+  // ================= PIE CHART =================
+
+  Widget _buildPieChart(Map<String, dynamic> data) {
+    final accepted = data['accepted'];
+    final rejected = data['rejected'];
+    final pending = data['pending'];
+
+    if (accepted + rejected + pending == 0) {
+      return const Center(child: Text("No applications"));
+    }
+
+    return PieChart(
+      PieChartData(
+        sectionsSpace: 3,
+        centerSpaceRadius: 40,
+        sections: [
+          PieChartSectionData(
+            value: accepted.toDouble(),
+            color: Colors.green,
+            title: "",
+          ),
+          PieChartSectionData(
+            value: rejected.toDouble(),
+            color: Colors.red,
+            title: "",
+          ),
+          PieChartSectionData(
+            value: pending.toDouble(),
+            color: Colors.orange,
+            title: "",
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegend() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        _LegendItem(color: Colors.green, text: "Accepted"),
+        SizedBox(height: 6),
+        _LegendItem(color: Colors.red, text: "Rejected"),
+        SizedBox(height: 6),
+        _LegendItem(color: Colors.orange, text: "Pending"),
+      ],
+    );
+  }
+
   String _generateInsight(Map<String, dynamic> data) {
     if (data['totalApplications'] == 0) {
       return "No applications received yet. Promote your job postings to increase visibility.";
     }
 
     if (data['acceptanceRate'] > 60) {
-      return "Strong hiring efficiency detected. Most candidates apply for ${data['mostAppliedJob']}. Top skill in demand: ${data['topSkill']}.";
+      return "Strong hiring efficiency detected. Continue maintaining quick review cycles.";
     }
 
     if (data['pending'] > data['accepted']) {
-      return "You have many pending applications. Faster review can improve hiring conversion rate.";
+      return "High pending applications detected. Faster review could improve hiring performance.";
     }
 
-    return "Your hiring activity is moderate. Consider optimizing job descriptions to attract better-matched candidates.";
+    return "Hiring performance is moderate. Optimizing job descriptions may improve candidate alignment.";
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  final Color color;
+  final String text;
+
+  const _LegendItem({required this.color, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(text),
+      ],
+    );
   }
 }
