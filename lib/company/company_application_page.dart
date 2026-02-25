@@ -255,3 +255,4 @@ class CompanyApplicationsPage extends StatelessWidget {
     );
   }
 }
+// working
