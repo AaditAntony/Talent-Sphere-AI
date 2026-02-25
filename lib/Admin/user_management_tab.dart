@@ -185,8 +185,7 @@ class UserManagementTab extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  UserDetailPage(userId: userId, userData: {}),
+                              builder: (_) => UserDetailPage(userId: userId),
                             ),
                           );
                         },
