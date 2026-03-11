@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -94,36 +93,76 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit Profile")),
+      backgroundColor: const Color(0xFFF8FAFC),
+
+      appBar: AppBar(
+        title: const Text("Edit Profile"),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1E293B),
+      ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: phoneController,
-              decoration: const InputDecoration(labelText: "Phone"),
+            /// BASIC INFO CARD
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.05),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: phoneController,
+                    decoration: const InputDecoration(
+                      labelText: "Phone",
+                      prefixIcon: Icon(Icons.phone_outlined),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  TextField(
+                    controller: educationController,
+                    decoration: const InputDecoration(
+                      labelText: "Education",
+                      prefixIcon: Icon(Icons.school_outlined),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  TextField(
+                    controller: experienceController,
+                    decoration: const InputDecoration(
+                      labelText: "Experience",
+                      prefixIcon: Icon(Icons.work_outline),
+                    ),
+                  ),
+                ],
+              ),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 30),
 
-            TextField(
-              controller: educationController,
-              decoration: const InputDecoration(labelText: "Education"),
+            /// SKILLS SECTION
+            const Text(
+              "Skills",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
             ),
 
-            const SizedBox(height: 15),
-
-            TextField(
-              controller: experienceController,
-              decoration: const InputDecoration(labelText: "Experience"),
-            ),
-
-            const SizedBox(height: 25),
-
-            const Text("Skills", style: TextStyle(fontWeight: FontWeight.bold)),
-
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
             Row(
               children: [
@@ -131,12 +170,17 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
                   child: TextField(
                     controller: skillController,
                     decoration: const InputDecoration(
-                      hintText: "Add skill and press +",
+                      hintText: "Add skill",
+                      prefixIcon: Icon(Icons.auto_awesome_outlined),
                     ),
                     onSubmitted: (_) => addSkill(),
                   ),
                 ),
-                IconButton(onPressed: addSkill, icon: const Icon(Icons.add)),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: addSkill,
+                  icon: const Icon(Icons.add_circle, color: Color(0xFF6366F1)),
+                ),
               ],
             ),
 
@@ -145,24 +189,58 @@ class _UserEditProfilePageState extends State<UserEditProfilePage> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: skills
-                  .map(
-                    (skill) => Chip(
-                      label: Text(skill),
-                      deleteIcon: const Icon(Icons.close),
-                      onDeleted: () => removeSkill(skill),
-                    ),
-                  )
-                  .toList(),
+              children: skills.map((skill) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEEF2FF),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        skill,
+                        style: const TextStyle(color: Color(0xFF6366F1)),
+                      ),
+
+                      const SizedBox(width: 6),
+
+                      GestureDetector(
+                        onTap: () => removeSkill(skill),
+                        child: const Icon(
+                          Icons.close,
+                          size: 16,
+                          color: Color(0xFF6366F1),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 35),
 
+            /// SAVE BUTTON
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: saveProfile,
-                child: const Text("Save Changes"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6366F1),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  "Save Changes",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,),
+                ),
               ),
             ),
           ],
