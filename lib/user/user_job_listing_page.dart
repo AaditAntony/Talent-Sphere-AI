@@ -9,7 +9,16 @@ class UserJobListingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Available Jobs")),
+      backgroundColor: const Color(0xFFF8FAFC),
+
+      appBar: AppBar(
+        title: const Text("Available Jobs"),
+        centerTitle: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1E293B),
+      ),
+
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('jobs')
@@ -56,21 +65,27 @@ class UserJobListingPage extends StatelessWidget {
                   }
 
                   final companyName = jobData['companyName'] ?? "Company";
-
                   final companyLogo = jobData['companyLogo'];
 
                   final List<String> skills = List<String>.from(
                     jobData['requiredSkills'] ?? [],
                   );
 
-                  return Card(
-                    elevation: 6,
-                    margin: const EdgeInsets.only(bottom: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 18),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 15,
+                          color: Colors.black.withOpacity(0.05),
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(18),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -82,23 +97,27 @@ class UserJobListingPage extends StatelessWidget {
                         );
                       },
                       child: Padding(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // 🔹 Company Row
+                            /// Company Row
                             Row(
                               children: [
                                 companyLogo != null && companyLogo != ""
                                     ? CircleAvatar(
-                                        radius: 22,
+                                        radius: 24,
                                         backgroundImage: MemoryImage(
                                           base64Decode(companyLogo),
                                         ),
                                       )
                                     : const CircleAvatar(
-                                        radius: 22,
-                                        child: Icon(Icons.business),
+                                        radius: 24,
+                                        backgroundColor: Color(0xFFEEF2FF),
+                                        child: Icon(
+                                          Icons.business,
+                                          color: Color(0xFF6366F1),
+                                        ),
                                       ),
 
                                 const SizedBox(width: 12),
@@ -109,26 +128,27 @@ class UserJobListingPage extends StatelessWidget {
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14,
+                                      color: Color(0xFF475569),
                                     ),
                                   ),
                                 ),
 
-                                // Job Type Badge
                                 if (jobData['jobType'] != null)
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
+                                      horizontal: 12,
+                                      vertical: 5,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.blue.shade50,
+                                      color: const Color(0xFFEEF2FF),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
                                       jobData['jobType'],
                                       style: const TextStyle(
                                         fontSize: 12,
-                                        color: Colors.blue,
+                                        color: Color(0xFF6366F1),
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
@@ -137,53 +157,100 @@ class UserJobListingPage extends StatelessWidget {
 
                             const SizedBox(height: 16),
 
-                            // 🔹 Job Title
+                            /// Job Title
                             Text(
                               jobData['title'] ?? "",
                               style: const TextStyle(
-                                fontSize: 18,
+                                fontSize: 19,
                                 fontWeight: FontWeight.bold,
+                                color: Color(0xFF1E293B),
                               ),
                             ),
 
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
 
-                            // 🔹 Location & Salary
+                            /// Location + Salary
                             Row(
                               children: [
-                                Text("📍 ${jobData['location']}"),
-                                const SizedBox(width: 15),
-                                Text("💰 ${jobData['salary']}"),
+                                const Icon(
+                                  Icons.location_on_outlined,
+                                  size: 16,
+                                  color: Colors.grey,
+                                ),
+
+                                const SizedBox(width: 4),
+
+                                Text(
+                                  jobData['location'] ?? "",
+                                  style: const TextStyle(
+                                    color: Color(0xFF64748B),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 18),
+
+                                const Icon(
+                                  Icons.attach_money,
+                                  size: 16,
+                                  color: Colors.grey,
+                                ),
+
+                                const SizedBox(width: 4),
+
+                                Text(
+                                  jobData['salary'] ?? "",
+                                  style: const TextStyle(
+                                    color: Color(0xFF64748B),
+                                  ),
+                                ),
                               ],
                             ),
 
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
 
-                            // 🔹 Skills Chips
+                            /// Skills
                             if (skills.isNotEmpty)
                               Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
+                                spacing: 8,
+                                runSpacing: 8,
                                 children: skills
-                                    .take(4) // show only 4
+                                    .take(4)
                                     .map(
-                                      (skill) => Chip(
-                                        label: Text(skill),
-                                        backgroundColor: Colors.grey.shade200,
+                                      (skill) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF1F5F9),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          skill,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFF475569),
+                                          ),
+                                        ),
                                       ),
                                     )
                                     .toList(),
                               ),
 
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
 
-                            // 🔹 Short Description Preview
+                            /// Description preview
                             if (jobData['description'] != null)
                               Text(
                                 jobData['description'].toString().length > 80
                                     ? "${jobData['description'].toString().substring(0, 80)}..."
                                     : jobData['description'],
-                                style: const TextStyle(color: Colors.grey),
+                                style: const TextStyle(
+                                  color: Color(0xFF64748B),
+                                  height: 1.4,
+                                ),
                               ),
                           ],
                         ),
