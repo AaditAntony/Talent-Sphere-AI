@@ -11,7 +11,15 @@ class UserAIRecommendedPage extends StatelessWidget {
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("AI Recommended Jobs")),
+      backgroundColor: const Color(0xFFF8FAFC),
+
+      appBar: AppBar(
+        title: const Text("AI Recommended Jobs"),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1E293B),
+      ),
+
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
             .collection('userProfiles')
@@ -23,7 +31,6 @@ class UserAIRecommendedPage extends StatelessWidget {
           }
 
           final userData = userSnapshot.data!.data() as Map<String, dynamic>;
-
           final userSkills = List<String>.from(userData['skills'] ?? []);
 
           return StreamBuilder<QuerySnapshot>(
@@ -63,7 +70,6 @@ class UserAIRecommendedPage extends StatelessWidget {
                   score += (matchCount / requiredSkills.length) * 80;
                 }
 
-                // Recent job bonus
                 final createdAt = (jobData['createdAt'] as Timestamp).toDate();
                 final daysOld = DateTime.now().difference(createdAt).inDays;
 
@@ -98,41 +104,125 @@ class UserAIRecommendedPage extends StatelessWidget {
                   final score = item['score'] as double;
                   final matchedSkills = item['matchedSkills'] as List<String>;
 
-                  return Card(
-                    elevation: 4,
-                    margin: const EdgeInsets.only(bottom: 15),
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 18),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 12,
+                          color: Colors.black.withOpacity(0.05),
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+
                     child: ListTile(
-                      title: Text(
-                        jobData['title'] ?? "",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      contentPadding: const EdgeInsets.all(16),
+
+                      title: Row(
                         children: [
-                          Text("Company: ${jobData['companyName']}"),
-                          const SizedBox(height: 5),
-                          Text(
-                            "AI Match: ${score.toInt()}%",
-                            style: const TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
+                          const Icon(
+                            Icons.work_outline,
+                            color: Color(0xFF6366F1),
+                          ),
+
+                          const SizedBox(width: 8),
+
+                          Expanded(
+                            child: Text(
+                              jobData['title'] ?? "",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Color(0xFF1E293B),
+                              ),
                             ),
                           ),
-                          if (matchedSkills.isNotEmpty)
-                            Text(
-                              "Matching Skills: ${matchedSkills.join(', ')}",
-                              style: const TextStyle(color: Colors.green),
-                            ),
                         ],
                       ),
+
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.business,
+                                  size: 16,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  jobData['companyName'] ?? "",
+                                  style: const TextStyle(
+                                    color: Color(0xFF64748B),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.auto_awesome,
+                                  size: 16,
+                                  color: Colors.green,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "AI Match: ${score.toInt()}%",
+                                  style: const TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            if (matchedSkills.isNotEmpty)
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: matchedSkills.map((skill) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEEF2FF),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      skill,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF6366F1),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                          ],
+                        ),
+                      ),
+
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: 10,
+                          vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.circular(12),
+                          color: const Color(0xFF6366F1),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         child: const Text(
                           "AI",
@@ -142,6 +232,7 @@ class UserAIRecommendedPage extends StatelessWidget {
                           ),
                         ),
                       ),
+
                       onTap: () {
                         Navigator.push(
                           context,
