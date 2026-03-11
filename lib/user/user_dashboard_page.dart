@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:talent_phere_ai/user/user_ai_recommended_page.dart';
 import 'package:talent_phere_ai/user/user_my_applciation_page.dart';
-
 import 'user_job_listing_page.dart';
-
 import 'user_profile_view_page.dart';
 
 class UserDashboardPage extends StatefulWidget {
@@ -26,30 +24,71 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+
       body: _pages[_currentIndex],
 
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        elevation: 10,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.work), label: "Jobs"),
-          BottomNavigationBarItem(icon: Icon(Icons.auto_awesome), label: "AI"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: "My Applications",
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 15,
+              color: Colors.black.withOpacity(0.05),
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+
+            selectedItemColor: const Color(0xFF6366F1),
+            unselectedItemColor: const Color(0xFF94A3B8),
+
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+
+            elevation: 0,
+
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.work_outline),
+                activeIcon: Icon(Icons.work),
+                label: "Jobs",
+              ),
+
+              BottomNavigationBarItem(
+                icon: Icon(Icons.auto_awesome_outlined),
+                activeIcon: Icon(Icons.auto_awesome),
+                label: "AI",
+              ),
+
+              BottomNavigationBarItem(
+                icon: Icon(Icons.assignment_outlined),
+                activeIcon: Icon(Icons.assignment),
+                label: "Applications",
+              ),
+
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                activeIcon: Icon(Icons.person),
+                label: "Profile",
+              ),
+            ],
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
+        ),
       ),
     );
   }
