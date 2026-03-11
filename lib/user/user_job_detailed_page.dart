@@ -17,7 +17,6 @@ class UserJobDetailPage extends StatelessWidget {
     final companyId = jobData['companyId'];
 
     try {
-      // 🔍 Prevent duplicate
       final existing = await FirebaseFirestore.instance
           .collection('applications')
           .where('jobId', isEqualTo: jobId)
@@ -31,7 +30,6 @@ class UserJobDetailPage extends StatelessWidget {
         return;
       }
 
-      // 🔥 Fetch user profile
       final profileDoc = await FirebaseFirestore.instance
           .collection('userProfiles')
           .doc(userId)
@@ -51,16 +49,12 @@ class UserJobDetailPage extends StatelessWidget {
         "jobTitle": jobData['title'],
         "companyId": companyId,
         "companyName": jobData['companyName'],
-
         "userId": userId,
         "userEmail": user.email,
         "userName": profileData['name'],
         "userSkills": profileData['skills'],
         "userProfileImage": profileData['profileImageBase64'],
-
-        // 🔥 IMPORTANT FIELD
         "resumeBase64": profileData['resumeBase64'],
-
         "status": "pending",
         "appliedAt": Timestamp.now(),
       });
@@ -94,45 +88,54 @@ class UserJobDetailPage extends StatelessWidget {
         .toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Job Details")),
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: const Text("Job Details"),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1E293B),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔥 Job Title
+            /// Job Title
             Text(
               jobData['title'] ?? "",
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1E293B),
+              ),
             ),
 
             const SizedBox(height: 6),
 
             Text(
               jobData['companyName'] ?? "",
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
+              style: const TextStyle(fontSize: 15, color: Color(0xFF64748B)),
             ),
 
             const SizedBox(height: 20),
 
-            // 🔥 AI Analysis Box
+            /// AI Analysis
             if (aiScore > 0) ...[
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.deepPurple),
+                  color: const Color(0xFFEEF2FF),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.auto_awesome, color: Colors.deepPurple),
+                        Icon(Icons.auto_awesome, color: Color(0xFF6366F1)),
                         SizedBox(width: 8),
                         Text(
-                          "AI Recommendation Analysis",
+                          "AI Recommendation",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -159,7 +162,7 @@ class UserJobDetailPage extends StatelessWidget {
                         style: const TextStyle(color: Colors.green),
                       ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
 
                     if (missingSkills.isNotEmpty)
                       Text(
@@ -171,7 +174,10 @@ class UserJobDetailPage extends StatelessWidget {
 
                     Text(
                       generateAIMessage(aiScore),
-                      style: const TextStyle(fontStyle: FontStyle.italic),
+                      style: const TextStyle(
+                        fontStyle: FontStyle.italic,
+                        color: Color(0xFF475569),
+                      ),
                     ),
                   ],
                 ),
@@ -180,33 +186,73 @@ class UserJobDetailPage extends StatelessWidget {
               const SizedBox(height: 25),
             ],
 
-            // 🔥 Location & Salary
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("📍 ${jobData['location']}"),
-                Text("💰 ${jobData['salary']}"),
-              ],
+            /// Job Info
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.04),
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 18,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(jobData['location'] ?? ""),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.attach_money,
+                        size: 18,
+                        color: Colors.grey,
+                      ),
+                      Text(jobData['salary'] ?? ""),
+                    ],
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 25),
 
-            // 🔥 Required Skills
+            /// Skills
             const Text(
               "Required Skills",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: requiredSkills
                   .map(
-                    (skill) => Chip(
-                      label: Text(skill),
-                      backgroundColor: Colors.blue.shade50,
+                    (skill) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(skill),
                     ),
                   )
                   .toList(),
@@ -214,36 +260,45 @@ class UserJobDetailPage extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            // 🔥 Description
+            /// Description
             const Text(
               "Job Description",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
             Text(
               jobData['description'] ?? "",
-              style: const TextStyle(height: 1.5),
+              style: const TextStyle(height: 1.6, color: Color(0xFF334155)),
             ),
 
             const SizedBox(height: 20),
 
             Text(
               "Posted On: ${DateFormat('dd MMM yyyy').format(createdAt)}",
-              style: const TextStyle(color: Colors.grey),
+              style: const TextStyle(color: Color(0xFF64748B)),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 35),
 
+            /// Apply Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => applyForJob(context),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: const Color(0xFF6366F1),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
-                child: const Text("Apply Now", style: TextStyle(fontSize: 16)),
+                child: const Text(
+                  "Apply Now",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
           ],
