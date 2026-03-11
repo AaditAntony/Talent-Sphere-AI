@@ -12,12 +12,16 @@ class UserProfileViewPage extends StatelessWidget {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+
       appBar: AppBar(
         title: const Text("My Profile"),
         elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1E293B),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: const Icon(Icons.edit_outlined),
             onPressed: () {
               Navigator.push(
                 context,
@@ -27,6 +31,7 @@ class UserProfileViewPage extends StatelessWidget {
           ),
         ],
       ),
+
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
             .collection('userProfiles')
@@ -42,25 +47,43 @@ class UserProfileViewPage extends StatelessWidget {
           }
 
           final data = snapshot.data!.data() as Map<String, dynamic>;
-
           final skills = List<String>.from(data['skills'] ?? []);
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+            padding: const EdgeInsets.all(20),
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 🔹 Profile Section
-                Center(
+                /// PROFILE HEADER
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 12,
+                        color: Colors.black.withOpacity(0.05),
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
                   child: Column(
                     children: [
                       CircleAvatar(
-                        radius: 50,
+                        radius: 55,
+                        backgroundColor: const Color(0xFFEEF2FF),
                         backgroundImage: data['profileImage'] != null
                             ? MemoryImage(base64Decode(data['profileImage']))
                             : null,
                         child: data['profileImage'] == null
-                            ? const Icon(Icons.person, size: 40)
+                            ? const Icon(
+                                Icons.person,
+                                size: 40,
+                                color: Color(0xFF6366F1),
+                              )
                             : null,
                       ),
 
@@ -69,8 +92,9 @@ class UserProfileViewPage extends StatelessWidget {
                       Text(
                         data['name'] ?? "",
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E293B),
                         ),
                       ),
 
@@ -78,19 +102,15 @@ class UserProfileViewPage extends StatelessWidget {
 
                       Text(
                         FirebaseAuth.instance.currentUser?.email ?? "",
-                        style: const TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Color(0xFF64748B)),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 35),
+                const SizedBox(height: 30),
 
-                const Divider(),
-
-                const SizedBox(height: 25),
-
-                // 🔥 AI PROFILE ANALYSIS
+                /// AI PROFILE ANALYSIS
                 FutureBuilder<QuerySnapshot>(
                   future: FirebaseFirestore.instance.collection('jobs').get(),
                   builder: (context, jobSnapshot) {
@@ -138,7 +158,7 @@ class UserProfileViewPage extends StatelessWidget {
                         const Text(
                           "AI Profile Analysis",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 17,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -146,10 +166,10 @@ class UserProfileViewPage extends StatelessWidget {
                         const SizedBox(height: 15),
 
                         Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(12),
+                            color: const Color(0xFFEEF2FF),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,19 +178,26 @@ class UserProfileViewPage extends StatelessWidget {
                                 "Profile Strength: $finalScore%",
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                 ),
                               ),
 
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
 
                               LinearProgressIndicator(
                                 value: finalScore / 100,
                                 minHeight: 8,
+                                borderRadius: BorderRadius.circular(10),
                               ),
 
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 14),
 
-                              Text("Market Compatibility: $marketLevel"),
+                              Text(
+                                "Market Compatibility: $marketLevel",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
 
                               const SizedBox(height: 8),
 
@@ -178,7 +205,7 @@ class UserProfileViewPage extends StatelessWidget {
                                 _generateProfileMessage(finalScore),
                                 style: const TextStyle(
                                   fontStyle: FontStyle.italic,
-                                  color: Colors.grey,
+                                  color: Color(0xFF475569),
                                 ),
                               ),
                             ],
@@ -191,32 +218,41 @@ class UserProfileViewPage extends StatelessWidget {
 
                 const SizedBox(height: 30),
 
-                const Divider(),
-
-                const SizedBox(height: 25),
-
-                // 🔹 Basic Info
+                /// BASIC INFO
                 const Text(
                   "Basic Information",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
 
                 const SizedBox(height: 15),
 
-                _buildInfoRow("Phone", data['phone']),
-                _buildInfoRow("Education", data['education']),
-                _buildInfoRow("Experience", data['experience']),
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 10,
+                        color: Colors.black.withOpacity(0.05),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      _buildInfoRow("Phone", data['phone']),
+                      _buildInfoRow("Education", data['education']),
+                      _buildInfoRow("Experience", data['experience']),
+                    ],
+                  ),
+                ),
 
                 const SizedBox(height: 30),
 
-                const Divider(),
-
-                const SizedBox(height: 25),
-
-                // 🔹 Skills
+                /// SKILLS
                 const Text(
                   "Skills",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
 
                 const SizedBox(height: 15),
@@ -224,29 +260,41 @@ class UserProfileViewPage extends StatelessWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: skills
-                      .map(
-                        (skill) => Chip(
-                          label: Text(skill),
-                          backgroundColor: Colors.grey.shade200,
-                        ),
-                      )
-                      .toList(),
+                  children: skills.map((skill) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(skill),
+                    );
+                  }).toList(),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 35),
 
-                // 🔹 Logout
+                /// LOGOUT BUTTON
                 SizedBox(
                   width: double.infinity,
-                  child: OutlinedButton(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.logout),
+                    label: const Text("Logout"),
                     onPressed: () async {
                       await FirebaseAuth.instance.signOut();
                     },
-                    style: OutlinedButton.styleFrom(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade50,
+                      foregroundColor: Colors.red,
                       padding: const EdgeInsets.symmetric(vertical: 14),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text("Logout"),
                   ),
                 ),
               ],
