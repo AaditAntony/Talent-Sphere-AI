@@ -156,6 +156,7 @@ class _UserSignUpPageState extends State<UserSignUpPage> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
+                                color: Colors.white,
                               ),
                             ),
                     ),
