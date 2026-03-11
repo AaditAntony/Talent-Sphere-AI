@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talent_phere_ai/core/login_page.dart';
 
-
 class CompanySignUpPage extends StatefulWidget {
   const CompanySignUpPage({super.key});
 
@@ -12,7 +11,6 @@ class CompanySignUpPage extends StatefulWidget {
 }
 
 class _CompanySignUpPageState extends State<CompanySignUpPage> {
-
   final _formKey = GlobalKey<FormState>();
 
   final emailController = TextEditingController();
@@ -21,18 +19,16 @@ class _CompanySignUpPageState extends State<CompanySignUpPage> {
   bool isLoading = false;
 
   Future<void> signUpCompany() async {
-
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => isLoading = true);
 
     try {
-
-      UserCredential credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+      UserCredential credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
 
       final uid = credential.user!.uid;
 
@@ -54,10 +50,10 @@ class _CompanySignUpPageState extends State<CompanySignUpPage> {
         context,
         MaterialPageRoute(builder: (_) => const LoginPage()),
       );
-
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
 
     setState(() => isLoading = false);
@@ -65,72 +61,137 @@ class _CompanySignUpPageState extends State<CompanySignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(title: const Text("Company Sign Up")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+      backgroundColor: const Color(0xFFF8FAFC),
 
-              const Text(
-                "Welcome to Company Registration",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+      appBar: AppBar(
+        title: const Text("Company Sign Up"),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1E293B),
+      ),
+
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+
+          child: Container(
+            padding: const EdgeInsets.all(25),
+
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 15,
+                  color: Colors.black.withOpacity(0.05),
+                  offset: const Offset(0, 6),
                 ),
-              ),
+              ],
+            ),
 
-              const SizedBox(height: 20),
+            child: Form(
+              key: _formKey,
 
-              TextFormField(
-                controller: emailController,
-                decoration: const InputDecoration(labelText: "Email"),
-                validator: (v) =>
-                    v!.isEmpty ? "Enter email" : null,
-              ),
-
-              const SizedBox(height: 15),
-
-              TextFormField(
-                controller: passwordController,
-                decoration: const InputDecoration(labelText: "Password"),
-                obscureText: true,
-                validator: (v) =>
-                    v!.length < 6 ? "Minimum 6 characters required" : null,
-              ),
-
-              const SizedBox(height: 25),
-
-              ElevatedButton(
-                onPressed: isLoading ? null : signUpCompany,
-                child: isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text("Create Account"),
-              ),
-
-              const SizedBox(height: 20),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text("Already have an account? "),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("Login"),
+                  const Icon(
+                    Icons.business_center,
+                    size: 50,
+                    color: Color(0xFF7C3AED),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  const Text(
+                    "Company Registration",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  TextFormField(
+                    controller: emailController,
+                    decoration: const InputDecoration(
+                      labelText: "Company Email",
+                      prefixIcon: Icon(Icons.email_outlined),
+                    ),
+                    validator: (v) => v!.isEmpty ? "Enter email" : null,
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  TextFormField(
+                    controller: passwordController,
+                    decoration: const InputDecoration(
+                      labelText: "Password",
+                      prefixIcon: Icon(Icons.lock_outline),
+                    ),
+                    obscureText: true,
+                    validator: (v) =>
+                        v!.length < 6 ? "Minimum 6 characters required" : null,
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : signUpCompany,
+
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF7C3AED),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+
+                      child: isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              "Create Account",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Already have an account? "),
+
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(
+                            color: Color(0xFF7C3AED),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-// working
