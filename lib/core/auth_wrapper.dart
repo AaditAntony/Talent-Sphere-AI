@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talent_phere_ai/Admin/admin_dashboard.dart';
 import 'package:talent_phere_ai/company/company_dashboard_page.dart';
 import 'package:talent_phere_ai/company/company_profile_setup.dart';
+import 'package:talent_phere_ai/company/company_rejected_page.dart';
 import 'package:talent_phere_ai/company/waiting_approval_screen.dart';
 import 'package:talent_phere_ai/user/user_dashboard_page.dart';
 import 'package:talent_phere_ai/user/user_profile_setup_page.dart';
@@ -70,6 +71,12 @@ class AuthWrapper extends StatelessWidget {
             if (role == "company") {
               if (!isProfileComplete) {
                 return const CompanyProfileSetupPage();
+              }
+
+              // 🔴 Rejected by admin
+              final isRejected = userData['isRejected'] ?? false;
+              if (isRejected == true) {
+                return const CompanyRejectedPage();
               }
 
               if (!isApproved) {

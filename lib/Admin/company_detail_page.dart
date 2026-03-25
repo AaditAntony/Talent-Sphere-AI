@@ -22,16 +22,14 @@ class CompanyDetailPage extends StatelessWidget {
 
   Future<void> rejectCompany(BuildContext context) async {
     await FirebaseFirestore.instance
-        .collection('companies')
-        .doc(companyId)
-        .delete();
-
-    await FirebaseFirestore.instance
         .collection('users')
         .doc(companyId)
-        .delete();
+        .update({
+      'isRejected': true,
+      'isApproved': false,
+    });
 
-    Navigator.pop(context);
+    if (context.mounted) Navigator.pop(context);
   }
 
   @override

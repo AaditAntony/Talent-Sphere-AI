@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:talent_phere_ai/company/company_my_job_page.dart';
 import 'company_overview_page.dart';
 import 'company_post_job_page.dart';
@@ -36,6 +37,15 @@ class _CompanyDashboardPageState extends State<CompanyDashboardPage> {
         elevation: 0,
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sign Out',
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+            },
+          ),
+        ],
       ),
 
       body: AnimatedSwitcher(
