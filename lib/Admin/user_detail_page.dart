@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:talent_phere_ai/company/resumer_view_page.dart';
 
 class UserDetailPage extends StatelessWidget {
   final String userId;
@@ -170,6 +171,37 @@ class UserDetailPage extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                if (hasResume) ...[
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ResumeViewerPage(
+                              base64Pdf: profileData['resumeBase64'],
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.picture_as_pdf),
+                      label: const Text(
+                        'View Resume',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2563EB),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
 
                 const SizedBox(height: 30),
 
