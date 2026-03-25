@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:talent_phere_ai/company/company_my_job_page.dart';
+import 'package:talent_phere_ai/core/login_page.dart';
 import 'company_overview_page.dart';
 import 'company_post_job_page.dart';
 import 'company_application_page.dart';
@@ -43,6 +44,13 @@ class _CompanyDashboardPageState extends State<CompanyDashboardPage> {
             tooltip: 'Sign Out',
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (route) => false,
+                );
+              }
             },
           ),
         ],
