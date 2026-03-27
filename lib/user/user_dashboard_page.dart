@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talent_phere_ai/user/user_ai_recommended_page.dart';
 import 'package:talent_phere_ai/user/user_my_applciation_page.dart';
+import 'package:talent_phere_ai/user/user_notifications_page.dart';
 import 'user_job_listing_page.dart';
 import 'user_profile_view_page.dart';
 
@@ -23,8 +26,85 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
+
+      appBar: AppBar(
+        title: const Text(
+          "Talent Sphere",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Color(0xFF1E293B),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        actions: [
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('notifications')
+                .doc(userId)
+                .collection('items')
+                .where('read', isEqualTo: false)
+                .snapshots(),
+            builder: (context, snapshot) {
+              final unreadCount =
+                  snapshot.hasData ? snapshot.data!.docs.length : 0;
+
+              return IconButton(
+                icon: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    const Icon(
+                      Icons.notifications_outlined,
+                      color: Color(0xFF1E293B),
+                      size: 26,
+                    ),
+                    if (unreadCount > 0)
+                      Positioned(
+                        right: -4,
+                        top: -4,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 18,
+                            minHeight: 18,
+                          ),
+                          child: Text(
+                            unreadCount > 9 ? "9+" : "$unreadCount",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const UserNotificationsPage(),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
 
       body: _pages[_currentIndex],
 
