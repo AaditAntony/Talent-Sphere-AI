@@ -20,7 +20,11 @@ class CompanyApprovalTab extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final pendingUsers = userSnapshot.data!.docs;
+        // Filter out rejected companies (isRejected == true)
+        final pendingUsers = userSnapshot.data!.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          return data['isRejected'] != true;
+        }).toList();
 
         if (pendingUsers.isEmpty) {
           return const Center(

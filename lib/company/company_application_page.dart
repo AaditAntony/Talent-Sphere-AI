@@ -175,6 +175,22 @@ class CompanyApplicationsPage extends StatelessWidget {
                                       .collection('applications')
                                       .doc(appDoc.id)
                                       .update({"status": "accepted"});
+
+                                  // Write notification for the user
+                                  final userId = appData['userId'];
+                                  if (userId != null) {
+                                    await FirebaseFirestore.instance
+                                        .collection('notifications')
+                                        .doc(userId)
+                                        .collection('items')
+                                        .add({
+                                      "companyName": appData['companyName'] ?? "",
+                                      "jobTitle": appData['jobTitle'] ?? "",
+                                      "status": "accepted",
+                                      "read": false,
+                                      "createdAt": Timestamp.now(),
+                                    });
+                                  }
                                 },
                                 icon: const Icon(Icons.check),
                                 label: const Text("Accept"),
@@ -199,6 +215,22 @@ class CompanyApplicationsPage extends StatelessWidget {
                                       .collection('applications')
                                       .doc(appDoc.id)
                                       .update({"status": "rejected"});
+
+                                  // Write notification for the user
+                                  final userId = appData['userId'];
+                                  if (userId != null) {
+                                    await FirebaseFirestore.instance
+                                        .collection('notifications')
+                                        .doc(userId)
+                                        .collection('items')
+                                        .add({
+                                      "companyName": appData['companyName'] ?? "",
+                                      "jobTitle": appData['jobTitle'] ?? "",
+                                      "status": "rejected",
+                                      "read": false,
+                                      "createdAt": Timestamp.now(),
+                                    });
+                                  }
                                 },
                                 icon: const Icon(Icons.close),
                                 label: const Text("Reject"),

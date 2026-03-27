@@ -35,8 +35,8 @@ class AuthWrapper extends StatelessWidget {
 
         final uid = authSnapshot.data!.uid;
 
-        return FutureBuilder<DocumentSnapshot>(
-          future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
+        return StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
 
           builder: (context, userSnapshot) {
             if (userSnapshot.connectionState == ConnectionState.waiting) {
