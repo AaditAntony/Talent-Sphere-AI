@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'application_detailed_page.dart';
+import 'candidate_search_page.dart';
 
 class CompanyApplicationsPage extends StatelessWidget {
   const CompanyApplicationsPage({super.key});
@@ -13,6 +14,17 @@ class CompanyApplicationsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CandidateSearchPage()),
+          );
+        },
+        backgroundColor: Colors.deepPurple,
+        child: const Icon(Icons.search, color: Colors.white),
+      ),
+      //  floatingActionButtonLocation: FloatingActionButtonLocation.,
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: StreamBuilder<QuerySnapshot>(
@@ -184,12 +196,13 @@ class CompanyApplicationsPage extends StatelessWidget {
                                         .doc(userId)
                                         .collection('items')
                                         .add({
-                                      "companyName": appData['companyName'] ?? "",
-                                      "jobTitle": appData['jobTitle'] ?? "",
-                                      "status": "accepted",
-                                      "read": false,
-                                      "createdAt": Timestamp.now(),
-                                    });
+                                          "companyName":
+                                              appData['companyName'] ?? "",
+                                          "jobTitle": appData['jobTitle'] ?? "",
+                                          "status": "accepted",
+                                          "read": false,
+                                          "createdAt": Timestamp.now(),
+                                        });
                                   }
                                 },
                                 icon: const Icon(Icons.check),
@@ -224,12 +237,13 @@ class CompanyApplicationsPage extends StatelessWidget {
                                         .doc(userId)
                                         .collection('items')
                                         .add({
-                                      "companyName": appData['companyName'] ?? "",
-                                      "jobTitle": appData['jobTitle'] ?? "",
-                                      "status": "rejected",
-                                      "read": false,
-                                      "createdAt": Timestamp.now(),
-                                    });
+                                          "companyName":
+                                              appData['companyName'] ?? "",
+                                          "jobTitle": appData['jobTitle'] ?? "",
+                                          "status": "rejected",
+                                          "read": false,
+                                          "createdAt": Timestamp.now(),
+                                        });
                                   }
                                 },
                                 icon: const Icon(Icons.close),
