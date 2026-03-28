@@ -2,24 +2,62 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talent_phere_ai/user/user_job_detailed_page.dart';
-import 'job_search_page.dart';
 
-class UserJobListingPage extends StatelessWidget {
-  const UserJobListingPage({super.key});
+class JobSearchPage extends StatefulWidget {
+  const JobSearchPage({super.key});
+
+  @override
+  State<JobSearchPage> createState() => _JobSearchPageState();
+}
+
+class _JobSearchPageState extends State<JobSearchPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = "";
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-
       appBar: AppBar(
-        title: const Text("Available Jobs"),
-        centerTitle: false,
-        elevation: 0,
+        title: const Text(
+          "Search Jobs",
+          style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1E293B),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.toLowerCase();
+                });
+              },
+              decoration: InputDecoration(
+                hintText: "Search by title, company, or location...",
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF6366F1)),
+                filled: true,
+                fillColor: const Color(0xFFF1F5F9),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+              ),
+            ),
+          ),
+        ),
       ),
-
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('jobs')
@@ -34,15 +72,42 @@ class UserJobListingPage extends StatelessWidget {
             return const Center(child: Text("No Jobs Available"));
           }
 
-          final jobs = snapshot.data!.docs;
+          final allJobs = snapshot.data!.docs;
+          final filteredJobs = allJobs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final title = (data['title'] ?? "").toString().toLowerCase();
+            final companyName = (data['companyName'] ?? "").toString().toLowerCase();
+            final location = (data['location'] ?? "").toString().toLowerCase();
+            
+            return title.contains(_searchQuery) || 
+                   companyName.contains(_searchQuery) || 
+                   location.contains(_searchQuery);
+          }).toList();
+
+          if (filteredJobs.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                   const Icon(Icons.search_off, size: 80, color: Color(0xFFCBD5E1)),
+                  const SizedBox(height: 16),
+                  Text(
+                    _searchQuery.isEmpty 
+                      ? "Start searching for jobs" 
+                      : "No jobs found for '$_searchQuery'",
+                    style: const TextStyle(color: Color(0xFF64748B), fontSize: 16),
+                  ),
+                ],
+              ),
+            );
+          }
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: jobs.length,
+            itemCount: filteredJobs.length,
             itemBuilder: (context, index) {
-              final jobDoc = jobs[index];
+              final jobDoc = filteredJobs[index];
               final jobData = jobDoc.data() as Map<String, dynamic>;
-
               final companyId = jobData['companyId'];
 
               return FutureBuilder<DocumentSnapshot>(
@@ -51,14 +116,12 @@ class UserJobListingPage extends StatelessWidget {
                     .doc(companyId)
                     .get(),
                 builder: (context, companySnapshot) {
-                  if (!companySnapshot.hasData ||
-                      !companySnapshot.data!.exists) {
+                  if (!companySnapshot.hasData || !companySnapshot.data!.exists) {
                     return const SizedBox();
                   }
 
                   final companyData =
                       companySnapshot.data!.data() as Map<String, dynamic>;
-
                   final isApproved = companyData['isApproved'] ?? false;
 
                   if (!isApproved) {
@@ -67,7 +130,6 @@ class UserJobListingPage extends StatelessWidget {
 
                   final companyName = jobData['companyName'] ?? "Company";
                   final companyLogo = jobData['companyLogo'];
-
                   final List<String> skills = List<String>.from(
                     jobData['requiredSkills'] ?? [],
                   );
@@ -102,7 +164,6 @@ class UserJobListingPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            /// Company Row
                             Row(
                               children: [
                                 companyLogo != null && companyLogo != ""
@@ -120,9 +181,7 @@ class UserJobListingPage extends StatelessWidget {
                                           color: Color(0xFF6366F1),
                                         ),
                                       ),
-
                                 const SizedBox(width: 12),
-
                                 Expanded(
                                   child: Text(
                                     companyName,
@@ -133,7 +192,6 @@ class UserJobListingPage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-
                                 if (jobData['jobType'] != null)
                                   Container(
                                     padding: const EdgeInsets.symmetric(
@@ -155,10 +213,7 @@ class UserJobListingPage extends StatelessWidget {
                                   ),
                               ],
                             ),
-
                             const SizedBox(height: 16),
-
-                            /// Job Title
                             Text(
                               jobData['title'] ?? "",
                               style: const TextStyle(
@@ -167,10 +222,7 @@ class UserJobListingPage extends StatelessWidget {
                                 color: Color(0xFF1E293B),
                               ),
                             ),
-
                             const SizedBox(height: 10),
-
-                            /// Location + Salary
                             Row(
                               children: [
                                 const Icon(
@@ -178,26 +230,20 @@ class UserJobListingPage extends StatelessWidget {
                                   size: 16,
                                   color: Colors.grey,
                                 ),
-
                                 const SizedBox(width: 4),
-
                                 Text(
                                   jobData['location'] ?? "",
                                   style: const TextStyle(
                                     color: Color(0xFF64748B),
                                   ),
                                 ),
-
                                 const SizedBox(width: 18),
-
                                 const Icon(
                                   Icons.attach_money,
                                   size: 16,
                                   color: Colors.grey,
                                 ),
-
                                 const SizedBox(width: 4),
-
                                 Text(
                                   jobData['salary'] ?? "",
                                   style: const TextStyle(
@@ -206,10 +252,7 @@ class UserJobListingPage extends StatelessWidget {
                                 ),
                               ],
                             ),
-
                             const SizedBox(height: 14),
-
-                            /// Skills
                             if (skills.isNotEmpty)
                               Wrap(
                                 spacing: 8,
@@ -239,20 +282,6 @@ class UserJobListingPage extends StatelessWidget {
                                     )
                                     .toList(),
                               ),
-
-                            const SizedBox(height: 14),
-
-                            /// Description preview
-                            if (jobData['description'] != null)
-                              Text(
-                                jobData['description'].toString().length > 80
-                                    ? "${jobData['description'].toString().substring(0, 80)}..."
-                                    : jobData['description'],
-                                style: const TextStyle(
-                                  color: Color(0xFF64748B),
-                                  height: 1.4,
-                                ),
-                              ),
                           ],
                         ),
                       ),
@@ -264,17 +293,6 @@ class UserJobListingPage extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const JobSearchPage()),
-          );
-        },
-        backgroundColor: const Color(0xFF6366F1),
-        child: const Icon(Icons.search, color: Colors.white),
-      ),
     );
   }
 }
-//
