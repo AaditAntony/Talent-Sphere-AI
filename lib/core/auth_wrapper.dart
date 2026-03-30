@@ -20,24 +20,27 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
-
       builder: (context, authSnapshot) {
+        // 1. Initial Loading
         if (authSnapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // 🔹 Not logged in
-        if (!authSnapshot.hasData) {
+        // 2. Auth State Check
+        final user = authSnapshot.data;
+
+        // 🔹 Not logged in (Wait a moment if currentUser might be loading, but authStateChanges handles this)
+        if (user == null) {
           return const LoginPage();
         }
 
-        final uid = authSnapshot.data!.uid;
+        final uid = user.uid;
 
+        // 3. User Data Sync
         return StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
-
           builder: (context, userSnapshot) {
             if (userSnapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(
@@ -50,7 +53,6 @@ class AuthWrapper extends StatelessWidget {
             }
 
             final userData = userSnapshot.data!.data() as Map<String, dynamic>;
-
             final role = userData['role'];
             final isProfileComplete = userData['isProfileComplete'] ?? false;
             final isApproved = userData['isApproved'] ?? false;
@@ -60,9 +62,7 @@ class AuthWrapper extends StatelessWidget {
               if (kIsWeb) {
                 return const AdminDashboardPage();
               } else {
-                // 🔥 Block admin login on mobile
                 FirebaseAuth.instance.signOut();
-
                 return const LoginPage();
               }
             }
@@ -73,7 +73,6 @@ class AuthWrapper extends StatelessWidget {
                 return const CompanyProfileSetupPage();
               }
 
-              // 🔴 Rejected by admin
               final isRejected = userData['isRejected'] ?? false;
               if (isRejected == true) {
                 return const CompanyRejectedPage();
@@ -91,7 +90,6 @@ class AuthWrapper extends StatelessWidget {
               if (!isProfileComplete) {
                 return const UserProfileSetupPage();
               }
-
               return const UserDashboardPage();
             }
 
